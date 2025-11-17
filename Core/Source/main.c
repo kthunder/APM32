@@ -53,12 +53,12 @@ int main(void)
 {
     /* Device configuration */
     DAL_DeviceConfig();
+    DAL_EnableCompensationCell();
 
     /* Infinite loop */
     // uartx_preinit();
-    // extern void winusbv2_init(uint8_t busid, uintptr_t reg_base);
-    // winusbv2_init(1,USB_OTG_HS_PERIPH_BASE);
     chry_dap_init(1,USB_OTG_HS_PERIPH_BASE);
+
     while (!usb_device_is_configured(1)) {
     }
 

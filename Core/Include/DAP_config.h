@@ -90,7 +90,7 @@ This information includes:
 /// Default communication speed on the Debug Access Port for SWD and JTAG mode.
 /// Used to initialize the default SWD/JTAG clock frequency.
 /// The command \ref DAP_SWJ_Clock can be used to overwrite this default setting.
-#define DAP_DEFAULT_SWJ_CLOCK   1000000U        ///< Default SWD/JTAG clock frequency in Hz.
+#define DAP_DEFAULT_SWJ_CLOCK   5000000U        ///< Default SWD/JTAG clock frequency in Hz.
 
 /// Maximum Package Size for Command and Response data.
 /// This configuration settings is used to optimize the communication performance with the
@@ -325,7 +325,7 @@ of the same I/O port. The following SWDIO I/O Pin functions are provided:
 // 0b0011推挽输出
 // clang-format off
 #define NOPx1() __NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();
-#define NOPx3() NOPx1();NOPx1();NOPx1();NOPx1();NOPx1();NOPx1();NOPx1();NOPx1();NOPx1();NOPx1();NOPx1();NOPx1();NOPx1();NOPx1();NOPx1();
+#define NOPx3() ;
 #define iPIN_TMS_INPUT_ENABLE()      PORT_DIO->MODE&=(~(0x1<<(1*2)));NOPx3()
 #define iPIN_TMS_INPUT_DISABLE()     PORT_DIO->MODE|=( (0x1<<(1*2)));NOPx3()
 
@@ -376,7 +376,7 @@ __STATIC_INLINE void PORT_JTAG_SETUP (void) {
     GPIO_InitStruct.Pin     = GPIO_PIN_8;
     GPIO_InitStruct.Mode    = GPIO_MODE_OUTPUT_PP;
     GPIO_InitStruct.Pull    = GPIO_PULLUP;
-    GPIO_InitStruct.Speed   = GPIO_SPEED_FAST;
+    GPIO_InitStruct.Speed   = GPIO_SPEED_HIGH;
 
     DAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
@@ -387,7 +387,7 @@ __STATIC_INLINE void PORT_JTAG_SETUP (void) {
     GPIO_InitStruct.Pin     = PIN_CLK | PIN_DIO | PIN_TDI | PIN_nRESET;
     GPIO_InitStruct.Mode    = GPIO_MODE_OUTPUT_PP;
     GPIO_InitStruct.Pull    = GPIO_PULLUP;
-    GPIO_InitStruct.Speed   = GPIO_SPEED_FAST;
+    GPIO_InitStruct.Speed   = GPIO_SPEED_HIGH;
 
     DAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
@@ -397,7 +397,7 @@ __STATIC_INLINE void PORT_JTAG_SETUP (void) {
     GPIO_InitStruct.Pin     = PIN_TDO;
     GPIO_InitStruct.Mode    = GPIO_MODE_INPUT;
     GPIO_InitStruct.Pull    = GPIO_PULLUP;
-    GPIO_InitStruct.Speed   = GPIO_SPEED_FAST;
+    GPIO_InitStruct.Speed   = GPIO_SPEED_HIGH;
 
     DAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 }
@@ -417,7 +417,7 @@ __STATIC_INLINE void PORT_SWD_SETUP (void) {
     GPIO_InitStruct.Pin     = GPIO_PIN_8;
     GPIO_InitStruct.Mode    = GPIO_MODE_OUTPUT_PP;
     GPIO_InitStruct.Pull    = GPIO_PULLUP;
-    GPIO_InitStruct.Speed   = GPIO_SPEED_FAST;
+    GPIO_InitStruct.Speed   = GPIO_SPEED_HIGH;
 
     DAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
@@ -428,7 +428,7 @@ __STATIC_INLINE void PORT_SWD_SETUP (void) {
     GPIO_InitStruct.Pin     = PIN_CLK | PIN_DIO | PIN_nRESET;
     GPIO_InitStruct.Mode    = GPIO_MODE_OUTPUT_PP;
     GPIO_InitStruct.Pull    = GPIO_PULLUP;
-    GPIO_InitStruct.Speed   = GPIO_SPEED_FAST;
+    GPIO_InitStruct.Speed   = GPIO_SPEED_HIGH;
 
     DAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
@@ -445,7 +445,7 @@ __STATIC_INLINE void PORT_OFF (void) {
     GPIO_InitStruct.Pin     = PIN_CLK | PIN_DIO | PIN_TDO | PIN_nRESET;
     GPIO_InitStruct.Mode    = GPIO_MODE_INPUT;
     GPIO_InitStruct.Pull    = GPIO_PULLUP;
-    GPIO_InitStruct.Speed   = GPIO_SPEED_FAST;
+    GPIO_InitStruct.Speed   = GPIO_SPEED_HIGH;
 
     DAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
     DAL_GPIO_DeInit(GPIOC, PIN_CLK | PIN_DIO | PIN_TDO | PIN_nRESET);

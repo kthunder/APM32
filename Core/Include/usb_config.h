@@ -9,8 +9,8 @@
 /* ================ USB common Configuration ================ */
 #define CONFIG_USBDEV_ADVANCE_DESC
 
-#define CONFIG_USB_PRINTF(...) printf(__VA_ARGS__)
-// #define CONFIG_USB_PRINTF(...)
+// #define CONFIG_USB_PRINTF(...) printf(__VA_ARGS__)
+#define CONFIG_USB_PRINTF(...)
 
 #ifndef CONFIG_USB_DBG_LEVEL
 #define CONFIG_USB_DBG_LEVEL USB_DBG_INFO
@@ -223,18 +223,18 @@
  */
 // #define CONFIG_USB_DWC2_RXALL_FIFO_SIZE (1024 / 4)
 /* IN Endpoints Max packet Size / 4 */
-#define CONFIG_USB_DWC2_RXALL_FIFO_SIZE (1024 / 4)
-#define CONFIG_USB_DWC2_TX0_FIFO_SIZE (64 / 4)
-#define CONFIG_USB_DWC2_TX1_FIFO_SIZE (512 / 4)  // 0x81 DAP
+#define CONFIG_USB_DWC2_RXALL_FIFO_SIZE (2048 / 4)
+#define CONFIG_USB_DWC2_TX0_FIFO_SIZE (512 / 4)
+#define CONFIG_USB_DWC2_TX1_FIFO_SIZE (1024 / 4)  // 0x81 DAP
 #define CONFIG_USB_DWC2_TX2_FIFO_SIZE (512 / 4)  // 0x82 CDC Data
 #define CONFIG_USB_DWC2_TX3_FIFO_SIZE (64 / 4)   // 0x83 CDC Interrupt
-#define CONFIG_USB_DWC2_TX4_FIFO_SIZE (512 / 4)  // 0x84 MSC
-#define CONFIG_USB_DWC2_TX5_FIFO_SIZE (512 / 4)  // 0x85 HID
+#define CONFIG_USB_DWC2_TX4_FIFO_SIZE (0 / 4)  // 0x84 MSC
+#define CONFIG_USB_DWC2_TX5_FIFO_SIZE (0 / 4)  // 0x85 HID
 #define CONFIG_USB_DWC2_TX6_FIFO_SIZE (0 / 4)
 #define CONFIG_USB_DWC2_TX7_FIFO_SIZE (0 / 4)
 #define CONFIG_USB_DWC2_TX8_FIFO_SIZE (0 / 4)
 
-// #define CONFIG_USB_DWC2_DMA_ENABLE
+#define CONFIG_USB_DWC2_DMA_ENABLE
 
 /* ---------------- MUSB Configuration ---------------- */
 // #define CONFIG_USB_MUSB_SUNXI

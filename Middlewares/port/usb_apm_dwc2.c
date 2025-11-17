@@ -523,8 +523,6 @@ int usb_dc_init(uint8_t busid)
 	memset(&g_dwc2_udc[busid], 0, sizeof(struct dwc2_udc));
 // USB_OTG_FS_PERIPH_BASE
 	usb_dc_low_level_init(busid);
-extern void usb_phy_config(uint8_t busid);
-	usb_phy_config(busid);
 
 	usbd_dwc2_delay_ms(10);
 

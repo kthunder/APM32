@@ -2,7 +2,7 @@ import usb.core
 import usb.util
 import time
 
-dev = usb.core.find(idVendor=0x0D28, idProduct=0x0204)
+dev = usb.core.find(idVendor=0x0D28, idProduct=0x0204, serial_number="10000000000000000123456789ABCDEF")
 if dev is None:
     raise ValueError("设备未找到")
 
@@ -31,12 +31,18 @@ print(ep_out)
 print(ep_in)
 
 def speed_test():
-    bytelen = 64 * 10000
+    bytelen = 1024 * 1024 * 10
     data = b'\xAA' * bytelen
+    
+    # 分块传输，每块 64KB
+    chunk_size = 65536
     start = time.time()
-    ep_out.write(data)
+    for i in range(0, len(data), chunk_size):
+        ep_out.write(data[i:i+chunk_size])
     duration = time.time() - start
-    print(f"速度: {bytelen / duration / 1024:.2f} KB/s")
+    
+    speed_mbps = bytelen * 8 / duration / 1000000
+    print(f"平均速度: {speed_mbps:.2f} Mbps")
 
 def dap_info(id):
     packet = bytearray([0x00, id] + [0] * 62)  # 填充到64字节
@@ -44,11 +50,12 @@ def dap_info(id):
     return ep_in.read(64, timeout=1000)
 
 if __name__ == "__main__":
+    speed_test()
     # 获取厂商信息 (ID=0x01)
-    info = dap_info(0x01)
-    print("厂商:", len(info))
-    print("厂商:", hex(info[0]))
-    print("厂商:", hex(info[1]))
+    # info = dap_info(0x01)
+    # print("厂商:", len(info))
+    # print("厂商:", hex(info[0]))
+    # print("厂商:", hex(info[1]))
     # ep_out.write(bytearray([0x7e, 1, 0x80, 1]))
     # try:
     #     data = ep_in.read(64, timeout=1000)
