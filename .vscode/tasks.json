@@ -1,0 +1,27 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "type": "shell",
+            "label": "Download",
+            "command": "openocd -f interface/cmsis-dap.cfg -f target/geehy/apm32f4x.cfg -c 'cmsis_dap_serial 00000000000000000123456789ABCDEF' -c'program ./build/APM32F4.elf reset exit' ",
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [],
+            "dependsOn":["Build"]
+        },
+        {
+            "type": "shell",
+            "label": "Build",
+            "command": "cmake -S . -B build -G Ninja ; cmake --build build -j12",
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [],
+            "hide": false
+        }
+    ]
+}
