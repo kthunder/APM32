@@ -16,10 +16,12 @@ set(DAP_PATH Middlewares/CherryDAP/DAP)
 target_include_directories(CherryDAP INTERFACE
     ${CMAKE_SOURCE_DIR}/${DAP_PATH}/Include
     ${CMAKE_SOURCE_DIR}/${DAP_PATH}/..
+    ${CMAKE_SOURCE_DIR}/${DAP_PATH}/../DAPHost
 )
 
 target_sources(CherryDAP INTERFACE
     ${CMAKE_SOURCE_DIR}/${DAP_PATH}/../dap_main.c
+    ${CMAKE_SOURCE_DIR}/${DAP_PATH}/../DAPHost/swd_host.c
     ${CMAKE_SOURCE_DIR}/${DAP_PATH}/Source/DAP_vendor.c
     ${CMAKE_SOURCE_DIR}/${DAP_PATH}/Source/DAP.c
     ${CMAKE_SOURCE_DIR}/${DAP_PATH}/Source/JTAG_DP.c

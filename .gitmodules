@@ -1,0 +1,6 @@
+[submodule "Middlewares/CherryUSB"]
+	path = Middlewares/CherryUSB
+	url = https://github.com/cherry-embedded/CherryUSB.git
+[submodule "Middlewares/CherryRB"]
+	path = Middlewares/CherryRB
+	url = https://github.com/cherry-embedded/CherryRB.git
