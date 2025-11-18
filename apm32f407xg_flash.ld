@@ -142,7 +142,6 @@ SECTIONS
     _sccmram = .;
     *(.ccmram)
     *(.ccmram*)
-    *(.bss.noncacheable*)
     
     . = ALIGN(4);
     _eccmram = .;

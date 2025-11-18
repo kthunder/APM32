@@ -324,22 +324,25 @@ of the same I/O port. The following SWDIO I/O Pin functions are provided:
 // 0b1000上下拉输入
 // 0b0011推挽输出
 // clang-format off
-#define NOPx1() __NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();
-#define NOPx3() ;
-#define iPIN_TMS_INPUT_ENABLE()      PORT_DIO->MODE&=(~(0x1<<(1*2)));NOPx3()
-#define iPIN_TMS_INPUT_DISABLE()     PORT_DIO->MODE|=( (0x1<<(1*2)));NOPx3()
+#define NOPx0() __NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();
+#define NOPx1() NOPx0();NOPx0();NOPx0();
 
-#define iGPIO_PUT(port, pin, val)   port->BSC = ((val)&1)?pin:(pin<<16)
-#define iGPIO_GET(port, pin)        ((port->IDATA & pin)>0)
+#define iPIN_TMS_INPUT_ENABLE()      *BITBAND_PERI(&PORT_DIO->MODE, __builtin_ctz(PIN_DIO)*2) = 0;NOPx1();
+#define iPIN_TMS_INPUT_DISABLE()     *BITBAND_PERI(&PORT_DIO->MODE, __builtin_ctz(PIN_DIO)*2) = 1;NOPx1();
+
+#define BITBAND_PERI(ref, bit) ((volatile uint32_t *)(PERIPH_BB_BASE + (((uint32_t)(ref) - 0x40000000) * 32) + ((bit) * 4)))
+
+#define iGPIO_PUT(port, pin, val)    *BITBAND_PERI(&port->ODATA, __builtin_ctz(pin)) = val;
+#define iGPIO_GET(port, pin)        ((port->IDATA & pin)!=0)
 #define iGPIO_SET(port, pin)        port->BSC = pin
 #define iGPIO_CLR(port, pin)        port->BSC = (pin << 16)
 
-#define iPIN_TCK_SET()  iGPIO_SET(PORT_CLK, PIN_CLK);NOPx3();
-#define iPIN_TCK_CLR()  iGPIO_CLR(PORT_CLK, PIN_CLK);NOPx3();
-#define iPIN_TMS_SET()  iGPIO_SET(PORT_DIO, PIN_DIO);NOPx3();
-#define iPIN_TMS_CLR()  iGPIO_CLR(PORT_DIO, PIN_DIO);NOPx3();
-#define iPIN_TMS_OUT(x) iGPIO_PUT(PORT_DIO, PIN_DIO, (x&1));NOPx3();
-#define iPIN_TDO_GET()  iGPIO_GET(PORT_DIO, PIN_DIO);NOPx3();
+#define iPIN_TCK_SET()  iGPIO_SET(PORT_CLK, PIN_CLK);NOPx1();
+#define iPIN_TCK_CLR()  iGPIO_CLR(PORT_CLK, PIN_CLK);NOPx1();
+#define iPIN_TMS_SET()  iGPIO_SET(PORT_DIO, PIN_DIO);NOPx1();
+#define iPIN_TMS_CLR()  iGPIO_CLR(PORT_DIO, PIN_DIO);NOPx1();
+#define iPIN_TMS_OUT(x) iGPIO_PUT(PORT_DIO, PIN_DIO, x);NOPx1();
+#define iPIN_TDO_GET()  iGPIO_GET(PORT_DIO, PIN_DIO);NOPx1();
 
 #define JTAG_CYCLE_TCK_FAST(tms, tdi, tdo) \
     do                                     \
