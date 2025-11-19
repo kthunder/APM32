@@ -69,7 +69,7 @@ This information includes:
 /// require 2 processor cycles for a I/O Port Write operation.  If the Debug Unit uses
 /// a Cortex-M0+ processor with high-speed peripheral I/O only 1 processor cycle might be
 /// required.
-#define IO_PORT_WRITE_CYCLES    1U              ///< I/O Cycles: 2=default, 1=Cortex-M0+ fast I/0.
+#define IO_PORT_WRITE_CYCLES    3U              ///< I/O Cycles: 2=default, 1=Cortex-M0+ fast I/0.
 
 /// Indicate that Serial Wire Debug (SWD) communication mode is available at the Debug Access Port.
 /// This information is returned by the command \ref DAP_Info as part of <b>Capabilities</b>.
@@ -324,11 +324,21 @@ of the same I/O port. The following SWDIO I/O Pin functions are provided:
 // 0b1000上下拉输入
 // 0b0011推挽输出
 // clang-format off
-#define NOPx0() __NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();
-#define NOPx1() NOPx0();NOPx0();NOPx0();
 
-#define iPIN_TMS_INPUT_ENABLE()      *BITBAND_PERI(&PORT_DIO->MODE, __builtin_ctz(PIN_DIO)*2) = 0;NOPx1();
-#define iPIN_TMS_INPUT_DISABLE()     *BITBAND_PERI(&PORT_DIO->MODE, __builtin_ctz(PIN_DIO)*2) = 1;NOPx1();
+__STATIC_FORCEINLINE void PIN_DELAY_SLOWX (volatile uint32_t delay) {
+  __asm volatile (
+    "1: subs %0, #1 \n"  // 1 cycle
+    "   bne 1b      \n"  // 2 cycles (taken) or 1 cycle (not taken)
+    : "+r" (delay)
+  );
+}
+
+extern uint32_t * delay_cjtag;
+
+#define cJTAG_DELAY() PIN_DELAY_SLOWX(*delay_cjtag);
+
+#define iPIN_TMS_INPUT_ENABLE()      *BITBAND_PERI(&PORT_DIO->MODE, __builtin_ctz(PIN_DIO)*2) = 0;cJTAG_DELAY();
+#define iPIN_TMS_INPUT_DISABLE()     *BITBAND_PERI(&PORT_DIO->MODE, __builtin_ctz(PIN_DIO)*2) = 1;cJTAG_DELAY();
 
 #define BITBAND_PERI(ref, bit) ((volatile uint32_t *)(PERIPH_BB_BASE + (((uint32_t)(ref) - 0x40000000) * 32) + ((bit) * 4)))
 
@@ -337,12 +347,12 @@ of the same I/O port. The following SWDIO I/O Pin functions are provided:
 #define iGPIO_SET(port, pin)        port->BSC = pin
 #define iGPIO_CLR(port, pin)        port->BSC = (pin << 16)
 
-#define iPIN_TCK_SET()  iGPIO_SET(PORT_CLK, PIN_CLK);NOPx1();
-#define iPIN_TCK_CLR()  iGPIO_CLR(PORT_CLK, PIN_CLK);NOPx1();
-#define iPIN_TMS_SET()  iGPIO_SET(PORT_DIO, PIN_DIO);NOPx1();
-#define iPIN_TMS_CLR()  iGPIO_CLR(PORT_DIO, PIN_DIO);NOPx1();
-#define iPIN_TMS_OUT(x) iGPIO_PUT(PORT_DIO, PIN_DIO, x);NOPx1();
-#define iPIN_TDO_GET()  iGPIO_GET(PORT_DIO, PIN_DIO);NOPx1();
+#define iPIN_TCK_SET()  iGPIO_SET(PORT_CLK, PIN_CLK);cJTAG_DELAY();
+#define iPIN_TCK_CLR()  iGPIO_CLR(PORT_CLK, PIN_CLK);cJTAG_DELAY();
+#define iPIN_TMS_SET()  iGPIO_SET(PORT_DIO, PIN_DIO);cJTAG_DELAY();
+#define iPIN_TMS_CLR()  iGPIO_CLR(PORT_DIO, PIN_DIO);cJTAG_DELAY();
+#define iPIN_TMS_OUT(x) iGPIO_PUT(PORT_DIO, PIN_DIO, x);cJTAG_DELAY();
+#define iPIN_TDO_GET()  iGPIO_GET(PORT_DIO, PIN_DIO);cJTAG_DELAY();
 
 #define JTAG_CYCLE_TCK_FAST(tms, tdi, tdo) \
     do                                     \

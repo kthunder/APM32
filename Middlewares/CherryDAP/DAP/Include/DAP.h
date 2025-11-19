@@ -331,11 +331,12 @@ void Set_Clock_Delay(uint32_t clock);
 #define DELAY_SLOW_CYCLES       3U      // Number of cycles for one iteration
 #endif
 
-__STATIC_FORCEINLINE void PIN_DELAY_SLOW (uint32_t delay) {
-  // volatile uint32_t count = delay;
-    // do {
-    //     // count -= 1;
-    // } while (delay--);
+__STATIC_FORCEINLINE void PIN_DELAY_SLOW (volatile uint32_t delay) {
+  __asm volatile (
+    "1: subs %0, #1 \n"  // 1 cycle
+    "   bne 1b      \n"  // 2 cycles (taken) or 1 cycle (not taken)
+    : "+r" (delay)
+  );
 }
 
 // Fixed delay for fast clock generation

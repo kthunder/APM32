@@ -52,7 +52,7 @@
 
          DAP_Data_t DAP_Data;           // DAP Data
 volatile uint8_t    DAP_TransferAbort;  // Transfer Abort Flag
-
+uint32_t * delay_cjtag = &DAP_Data.clock_delay;
 
 static const char DAP_FW_Ver [] = DAP_FW_VER;
 
@@ -79,6 +79,11 @@ __attribute__((weak)) void Set_Clock_Delay(uint32_t clock) {
 
     DAP_Data.clock_delay = delay;
   }
+
+  // printf("MAX clock    %d Hz\r\n", MAX_SWJ_CLOCK(DELAY_FAST_CYCLES));
+  // printf("set clock to %d Hz\r\n", clock); 
+  // printf("is fast_clock %d\r\n", DAP_Data.fast_clock);
+  // printf("clock_delay   %d\r\n", DAP_Data.clock_delay);
 }
 
 
