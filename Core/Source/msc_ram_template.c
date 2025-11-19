@@ -5,6 +5,7 @@
  */
 #include "usbd_core.h"
 #include "usbd_msc.h"
+#include "main.h"
 
 #define MSC_IN_EP  0x81
 #define MSC_OUT_EP 0x02
@@ -191,7 +192,7 @@ static void usbd_event_handler(uint8_t busid, uint8_t event)
 
 #if !defined(RT_CHERRYUSB_DEVICE_TEMPLATE_MSC_BLKDEV) && !defined(PKG_CHERRYUSB_DEVICE_TEMPLATE_MSC_BLKDEV)
 #define BLOCK_SIZE  512
-#define BLOCK_COUNT 10
+#define BLOCK_COUNT 12
 
 typedef struct
 {
@@ -247,14 +248,23 @@ int usbd_msc_sector_read(uint8_t busid, uint8_t lun, uint32_t sector, uint8_t *b
     }
     return 0;
 }
-
+bool flash_start = false;
+uint32_t flash_timer = 0;
+extern void flash_erase(uint32_t addr);
+extern void flash_program(uint32_t addr, uint8_t *data);
 int usbd_msc_sector_write(uint8_t busid, uint8_t lun, uint32_t sector, uint8_t *buffer, uint32_t length)
 {
+    uint32_t addr = (sector-12) * BLOCK_SIZE + 0x08010000;
     if (sector < 12)
         memcpy(mass_block[sector].BlockSpace, buffer, length);
     else
     {
-        // flash
+        flash_erase(addr);
+        flash_program(addr, buffer);
+        flash_start = true;
+        flash_timer = DAL_GetTick();
+        printf("TIMER %d s\r\n", DAL_GetTick());
+        printf("flash_timer %d s\r\n", flash_timer);
     }
     return 0;
 }

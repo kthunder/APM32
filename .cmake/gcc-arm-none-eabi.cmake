@@ -36,7 +36,7 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -Wpedantic -fdata-sections -ff
 #     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Os -g0")
 # endif()
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Os -g0")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O0 -g0")
 
 set(CMAKE_ASM_FLAGS "${CMAKE_C_FLAGS} -x assembler-with-cpp -MMD -MP")
 set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -fno-rtti -fno-exceptions -fno-threadsafe-statics")

@@ -60,14 +60,4 @@ void DAL_GPIO_Config(void)
     DAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
     DAL_GPIO_WritePin(GPIOA, GPIO_PIN_8, GPIO_PIN_RESET);
-
-    /* Configure the LED pin */
-    GPIO_InitStruct.Pin     = GPIO_PIN_1;
-    GPIO_InitStruct.Mode    = GPIO_MODE_OUTPUT_PP;
-    GPIO_InitStruct.Pull    = GPIO_PULLUP;
-    GPIO_InitStruct.Speed   = GPIO_SPEED_FAST;
-
-    DAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
-
-    DAL_GPIO_WritePin(GPIOC, GPIO_PIN_1, GPIO_PIN_RESET);
 }
