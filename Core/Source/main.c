@@ -29,9 +29,8 @@
 /* Private includes *******************************************************/
 #include "apm32f4xx_device_cfg.h"
 #include <string.h>
-#include "dap_main.h"
 /* Private macro **********************************************************/
-
+#define FLASH_USER_ADDR         ((uint32_t)0x08040000U)
 /* Private typedef ********************************************************/
 
 /* Private variables ******************************************************/
@@ -51,19 +50,36 @@
  */
 int main(void)
 {
+    uint32_t sectorError = 0U;
+    
+    FLASH_EraseInitTypeDef Erase_InitStruct = {0};
     /* Device configuration */
     DAL_DeviceConfig();
     DAL_EnableCompensationCell();
-
-    /* Infinite loop */
-    // uartx_preinit();
-    chry_dap_init(1,USB_OTG_HS_PERIPH_BASE);
-
-    while (!usb_device_is_configured(1)) {
+    /* Unlock the Flash */
+    DAL_FLASH_Unlock();
+    /* Erase sector */
+    Erase_InitStruct.Sector         = FLASH_SECTOR_6;
+    Erase_InitStruct.NbSectors      = 1U;
+    Erase_InitStruct.TypeErase      = FLASH_TYPEERASE_SECTORS;
+    Erase_InitStruct.VoltageRange   = FLASH_VOLTAGE_RANGE_3;
+    if(DAL_FLASHEx_Erase(&Erase_InitStruct, &sectorError) != DAL_OK)
+    {
+        Error_Handler();
+    }
+    
+    if (DAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, FLASH_USER_ADDR, 0x12345678U) != DAL_OK)
+    {
+        Error_Handler();
     }
 
+    /* Lock the Flash to */
+    DAL_FLASH_Lock();
+
+    /* Infinite loop */
+    extern void msc_ram_init(uint8_t busid, uintptr_t reg_base);
+    msc_ram_init(1, USB_OTG_HS_PERIPH_BASE);
     while (1) {
-        chry_dap_handle(1);
-        // chry_dap_usb2uart_handle(1);
+    
     }
 }

@@ -53,7 +53,7 @@ add_compile_definitions(HSE_VALUE=12000000U)
 # add_subdirectory(.cmake/stm32cubemx)
 add_subdirectory(.cmake/app)
 add_subdirectory(.cmake/CherryUSB)
-add_subdirectory(.cmake/CherryDAP)
+# add_subdirectory(.cmake/CherryDAP)
 
 # Link directories setup
 target_link_directories(${CMAKE_PROJECT_NAME} PRIVATE
@@ -81,7 +81,7 @@ target_link_libraries(${CMAKE_PROJECT_NAME}
     # stm32cubemx
     app
     CherryUSB
-    CherryDAP
+    # CherryDAP
     # Add user defined libraries
 )
 
