@@ -136,7 +136,7 @@ void boot_jump_to_app(uint32_t app_addr)
     pFunction jump_to_app;
     
     /* Check if valid application exists */
-    if (((*(__IO uint32_t*)app_addr) & 0x2FFE0000) == 0x20000000) {
+    if (((*(__IO uint32_t*)app_addr) & 0x20000000) == 0x20000000) {
         /* Get jump address from vector table */
         jump_addr = *(__IO uint32_t*)(app_addr + 4);
         jump_to_app = (pFunction)jump_addr;
