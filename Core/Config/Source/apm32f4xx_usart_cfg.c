@@ -35,6 +35,8 @@
 
 /* Private variables ******************************************************/
 UART_HandleTypeDef huart1;
+DMA_HandleTypeDef hdma_usart1Tx;
+DMA_HandleTypeDef hdma_usart1Rx;
 
 /* Private function prototypes ********************************************/
 
@@ -76,7 +78,7 @@ void DAL_USART1_Config(void)
  */
 void DAL_UART_MspInit(UART_HandleTypeDef *huart)
 {
-    GPIO_InitTypeDef GPIO_InitStruct = {0U};
+    GPIO_InitTypeDef GPIO_InitStruct = {0};
 
     if (huart->Instance == USART1)
     {
@@ -85,6 +87,9 @@ void DAL_UART_MspInit(UART_HandleTypeDef *huart)
         
         /* Enable USART1 clock */
         __DAL_RCM_USART1_CLK_ENABLE();
+        
+        /* Enable DMA2 clock */
+        __DAL_RCM_DMA2_CLK_ENABLE();
 
         /* Configure the UART TX and RX pin */
         GPIO_InitStruct.Pin         = GPIO_PIN_9 | GPIO_PIN_10;
@@ -94,6 +99,50 @@ void DAL_UART_MspInit(UART_HandleTypeDef *huart)
         GPIO_InitStruct.Alternate   = GPIO_AF7_USART1;
 
         DAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+        /* Configure USART1 TX DMA */
+        hdma_usart1Tx.Instance                  = DMA2_Stream7;
+        hdma_usart1Tx.Init.Channel              = DMA_CHANNEL_4;
+        hdma_usart1Tx.Init.Direction            = DMA_MEMORY_TO_PERIPH;
+        hdma_usart1Tx.Init.PeriphInc            = DMA_PINC_DISABLE;
+        hdma_usart1Tx.Init.MemInc               = DMA_MINC_ENABLE;
+        hdma_usart1Tx.Init.PeriphDataAlignment  = DMA_PDATAALIGN_BYTE;
+        hdma_usart1Tx.Init.MemDataAlignment     = DMA_MDATAALIGN_BYTE;
+        hdma_usart1Tx.Init.Mode                 = DMA_NORMAL;
+        hdma_usart1Tx.Init.Priority             = DMA_PRIORITY_LOW;
+        hdma_usart1Tx.Init.FIFOMode             = DMA_FIFOMODE_DISABLE;
+        hdma_usart1Tx.Init.FIFOThreshold        = DMA_FIFO_THRESHOLD_FULL;
+        hdma_usart1Tx.Init.PeriphBurst          = DMA_PBURST_INC4;
+        hdma_usart1Tx.Init.MemBurst             = DMA_MBURST_INC4;
+        if (DAL_DMA_Init(&hdma_usart1Tx) != DAL_OK)
+        {
+            Error_Handler();
+        }
+
+        /* Link DMA handle */
+        __DAL_LINKDMA(huart, hdmatx, hdma_usart1Tx);
+
+        /* Configure USART1 RX DMA */
+        hdma_usart1Rx.Instance                  = DMA2_Stream5;
+        hdma_usart1Rx.Init.Channel              = DMA_CHANNEL_4;
+        hdma_usart1Rx.Init.Direction            = DMA_PERIPH_TO_MEMORY;
+        hdma_usart1Rx.Init.PeriphInc            = DMA_PINC_DISABLE;
+        hdma_usart1Rx.Init.MemInc               = DMA_MINC_ENABLE;
+        hdma_usart1Rx.Init.PeriphDataAlignment  = DMA_PDATAALIGN_BYTE;
+        hdma_usart1Rx.Init.MemDataAlignment     = DMA_MDATAALIGN_BYTE;
+        hdma_usart1Rx.Init.Mode                 = DMA_NORMAL;
+        hdma_usart1Rx.Init.Priority             = DMA_PRIORITY_LOW;
+        hdma_usart1Rx.Init.FIFOMode             = DMA_FIFOMODE_DISABLE;
+        hdma_usart1Rx.Init.FIFOThreshold        = DMA_FIFO_THRESHOLD_FULL;
+        hdma_usart1Rx.Init.PeriphBurst          = DMA_PBURST_INC4;
+        hdma_usart1Rx.Init.MemBurst             = DMA_MBURST_INC4;
+        if (DAL_DMA_Init(&hdma_usart1Rx) != DAL_OK)
+        {
+            Error_Handler();
+        }
+
+        /* Link DMA handle */
+        __DAL_LINKDMA(huart, hdmarx, hdma_usart1Rx);
     }
 }
 
@@ -115,6 +164,10 @@ void DAL_UART_MspDeInit(UART_HandleTypeDef *huart)
         
         /* Disable USART and GPIO clocks */
         DAL_GPIO_DeInit(GPIOA, GPIO_PIN_9 | GPIO_PIN_10);
+
+        /* USART1 DMA de-init */
+        DAL_DMA_DeInit(huart->hdmatx);
+        DAL_DMA_DeInit(huart->hdmarx);
     }
 }
 

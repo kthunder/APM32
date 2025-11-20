@@ -51,4 +51,16 @@ void DAL_NVIC_Config(void)
 {
     /* Set interrupt group priority */
     DAL_NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_4);
+
+    /* USART1 interrupt */
+    DAL_NVIC_SetPriority(USART1_IRQn, 1U, 0U);
+    DAL_NVIC_EnableIRQ(USART1_IRQn);
+
+    /* USART1 RX DMA interrupt */
+    DAL_NVIC_SetPriority(DMA2_Stream5_IRQn, 2U, 0U);
+    DAL_NVIC_EnableIRQ(DMA2_Stream5_IRQn);
+
+    /* USART1 TX DMA interrupt */
+    DAL_NVIC_SetPriority(DMA2_Stream7_IRQn, 3U, 0U);
+    DAL_NVIC_EnableIRQ(DMA2_Stream7_IRQn);
 }

@@ -37,7 +37,10 @@
 /* Private function prototypes ********************************************/
 
 /* External variables *****************************************************/
-// extern PCD_HandleTypeDef husbDevice;
+extern PCD_HandleTypeDef husbDevice;
+extern DMA_HandleTypeDef hdma_usart1Tx;
+extern DMA_HandleTypeDef hdma_usart1Rx;
+extern UART_HandleTypeDef huart1;
 
 /* External functions *****************************************************/
 
@@ -179,4 +182,43 @@ void OTG_HS1_IRQHandler(void)
     // DAL_PCD_IRQHandler(&husbDevice);
     extern void USBD_IRQHandler(uint8_t busid);
     USBD_IRQHandler(1);
+}
+
+/**
+ * @brief     This function handles DMA2 stream 5 request
+ *
+ * @param     None
+ *
+ * @retval    None
+ *
+ */
+void DMA2_STR5_IRQHandler(void)
+{
+    DAL_DMA_IRQHandler(&hdma_usart1Rx);
+}
+
+/**
+ * @brief     This function handles DMA2 stream 7 request
+ *
+ * @param     None
+ *
+ * @retval    None
+ *
+ */
+void DMA2_STR7_IRQHandler(void)
+{
+    DAL_DMA_IRQHandler(&hdma_usart1Tx);
+}
+
+/**
+ * @brief     This function handles USART1 request
+ *
+ * @param     None
+ *
+ * @retval    None
+ *
+ */
+void USART1_IRQHandler(void)
+{
+    DAL_UART_IRQHandler(&huart1);
 }

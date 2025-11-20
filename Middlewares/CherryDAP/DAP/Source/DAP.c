@@ -505,7 +505,6 @@ void cJTAG_tms(uint32_t bits, uint8_t* ucTMS)
 
 void cJtag_active(void)
 {
-    printf("%s\n", __func__);
     JTAG_sequence_escape(10);
     JTAG_sequence_tms(0xFFFF, 24);
     JTAG_sequence_escape(7);

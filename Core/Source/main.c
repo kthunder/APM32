@@ -42,6 +42,7 @@
 
 /* External functions *****************************************************/
 
+extern UART_HandleTypeDef huart1;
 /**
  * @brief   Main program
  *
@@ -57,7 +58,6 @@ int main(void)
     DAL_EnableCompensationCell();
 
     /* Infinite loop */
-    // uartx_preinit();
     chry_dap_init(1,USB_OTG_HS_PERIPH_BASE);
 
     while (!usb_device_is_configured(1)) {
@@ -65,6 +65,16 @@ int main(void)
 
     while (1) {
         chry_dap_handle(1);
-        // chry_dap_usb2uart_handle(1);
+        chry_dap_usb2uart_handle(1);
     }
 }
+
+/*
+    PA8 : LED
+    PA9 : TX
+    PA10: RX
+    PA13: MCU_SWDIO
+    PA14: MCU_SWCLK
+    PC0 : DAP_SWCLK
+    PC1 : DAP_SWDIO
+*/

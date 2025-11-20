@@ -632,57 +632,57 @@ void usbd_cdc_acm_get_line_coding(uint8_t busid, uint8_t intf, struct cdc_line_c
 
 void chry_dap_usb2uart_handle(uint8_t busid)
 {
-    // uint32_t size;
-    // uint8_t *buffer;
+    uint32_t size;
+    uint8_t *buffer;
 
-    // if (config_uart) {
-    //     /* disable irq here */
-    //     config_uart = 0;
-    //     /* config uart here */
-    //     chry_dap_usb2uart_uart_config_callback((struct cdc_line_coding *)&g_cdc_lincoding);
-    //     usbtx_idle_flag = 1;
-    //     uarttx_idle_flag = 1;
-    //     config_uart_transfer = 1;
-    //     //chry_ringbuffer_reset_read(&g_uartrx);
-    //     /* enable irq here */
-    // }
+    if (config_uart) {
+        /* disable irq here */
+        config_uart = 0;
+        /* config uart here */
+        chry_dap_usb2uart_uart_config_callback((struct cdc_line_coding *)&g_cdc_lincoding);
+        usbtx_idle_flag = 1;
+        uarttx_idle_flag = 1;
+        config_uart_transfer = 1;
+        //chry_ringbuffer_reset_read(&g_uartrx);
+        /* enable irq here */
+    }
 
-    // if (config_uart_transfer == 0) {
-    //     return;
-    // }
+    if (config_uart_transfer == 0) {
+        return;
+    }
 
-    // /* why we use chry_ringbuffer_linear_read_setup?
-    //  * becase we use dma and we do not want to use temp buffer to memcpy from ringbuffer
-    //  *
-    // */
+    /* why we use chry_ringbuffer_linear_read_setup?
+     * becase we use dma and we do not want to use temp buffer to memcpy from ringbuffer
+     *
+    */
 
-    // /* uartrx to usb tx */
-    // if (usbtx_idle_flag) {
-    //     if (chry_ringbuffer_get_used(&g_uartrx)) {
-    //         usbtx_idle_flag = 0;
-    //         /* start first transfer */
-    //         buffer = chry_ringbuffer_linear_read_setup(&g_uartrx, &size);
-    //         usbd_ep_start_write(1, CDC_IN_EP, buffer, size);
-    //     }
-    // }
+    /* uartrx to usb tx */
+    if (usbtx_idle_flag) {
+        if (chry_ringbuffer_get_used(&g_uartrx)) {
+            usbtx_idle_flag = 0;
+            /* start first transfer */
+            buffer = chry_ringbuffer_linear_read_setup(&g_uartrx, &size);
+            usbd_ep_start_write(busid, CDC_IN_EP, buffer, size);
+        }
+    }
 
-    // /* usbrx to uart tx */
-    // if (uarttx_idle_flag) {
-    //     if (chry_ringbuffer_get_used(&g_usbrx)) {
-    //         uarttx_idle_flag = 0;
-    //         /* start first transfer */
-    //         buffer = chry_ringbuffer_linear_read_setup(&g_usbrx, &size);
-    //         chry_dap_usb2uart_uart_send_bydma(buffer, size);
-    //     }
-    // }
+    /* usbrx to uart tx */
+    if (uarttx_idle_flag) {
+        if (chry_ringbuffer_get_used(&g_usbrx)) {
+            uarttx_idle_flag = 0;
+            /* start first transfer */
+            buffer = chry_ringbuffer_linear_read_setup(&g_usbrx, &size);
+            chry_dap_usb2uart_uart_send_bydma(buffer, size);
+        }
+    }
 
-    // /* check whether usb rx ringbuffer have space to store */
-    // if (usbrx_idle_flag) {
-    //     if (chry_ringbuffer_get_free(&g_usbrx) >= DAP_PACKET_SIZE) {
-    //         usbrx_idle_flag = 0;
-    //         usbd_ep_start_read(1, CDC_OUT_EP, usb_tmpbuffer, DAP_PACKET_SIZE);
-    //     }
-    // }
+    /* check whether usb rx ringbuffer have space to store */
+    if (usbrx_idle_flag) {
+        if (chry_ringbuffer_get_free(&g_usbrx) >= DAP_PACKET_SIZE) {
+            usbrx_idle_flag = 0;
+            usbd_ep_start_read(busid, CDC_OUT_EP, usb_tmpbuffer, DAP_PACKET_SIZE);
+        }
+    }
 }
 
 /* implment by user */
