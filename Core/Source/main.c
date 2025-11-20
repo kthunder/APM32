@@ -51,6 +51,7 @@
  */
 int main(void)
 {
+    SCB->VTOR = 0x08010000;
     /* Device configuration */
     DAL_DeviceConfig();
     DAL_EnableCompensationCell();
