@@ -263,8 +263,6 @@ int usbd_msc_sector_write(uint8_t busid, uint8_t lun, uint32_t sector, uint8_t *
         flash_program(addr, buffer);
         flash_start = true;
         flash_timer = DAL_GetTick();
-        printf("TIMER %d s\r\n", DAL_GetTick());
-        printf("flash_timer %d s\r\n", flash_timer);
     }
     return 0;
 }

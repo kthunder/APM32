@@ -66,8 +66,6 @@ void flash_erase(uint32_t addr)
     
     for (int i = 0; i < (11); i++) 
     {
-        printf("1 %08X %d\r\n", sector_addr[i], addr>=sector_addr[i]);
-        printf("2 %08X %d\r\n", sector_addr[i+1], addr<sector_addr[i+1]);
         if ((addr>=sector_addr[i]) && (addr<sector_addr[i+1]) )
         {
             sectorNum = i;
@@ -95,8 +93,6 @@ void flash_erase(uint32_t addr)
     {
         Error_Handler();
     }
-    printf("Erase %08X\r\n", addr);
-    printf("sectorNum %d\r\n", sectorNum);
     erase_flag[sectorNum] = 1;
 
     /* Lock the Flash to */
@@ -110,13 +106,10 @@ void flash_program(uint32_t addr, uint8_t *data)
     uint32_t *page = (uint32_t *)data;
 
     for (int i = 0; i < (512/4); i++) {
-        printf("data addr %08X\r\n", &page[i]);
-        printf("Program %08X\r\n", addr+i*4);
         if (DAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, addr+i*4, page[i]) != DAL_OK)
         {
             Error_Handler();
         }
-        printf("Program OK\r\n");
     }
     
     /* Lock the Flash to */
@@ -124,7 +117,6 @@ void flash_program(uint32_t addr, uint8_t *data)
 }
 
 typedef void (*pFunction)(void);
-
 /**
  * @brief   Jump to application
  * @param   app_addr: Application start address
@@ -132,26 +124,35 @@ typedef void (*pFunction)(void);
  */
 void boot_jump_to_app(uint32_t app_addr)
 {
-    uint32_t jump_addr;
-    pFunction jump_to_app;
+    #define APPLICATION_ADDRESS 0x08010000
+    pFunction JumpToApplication;
+    uint32_t JumpAddress;
+
+    RCM->AHB1RST = 0xFFFFFFFFU;
+    RCM->APB1RST = 0xFFFFFFFFU;
+    RCM->APB2RST = 0xFFFFFFFFU;
+    RCM->AHB2RST = 0xFFFFFFFFU;
     
-    /* Check if valid application exists */
-    if (((*(__IO uint32_t*)app_addr) & 0x20000000) == 0x20000000) {
-        /* Get jump address from vector table */
-        jump_addr = *(__IO uint32_t*)(app_addr + 4);
-        jump_to_app = (pFunction)jump_addr;
-        
-        /* Disable all interrupts */
-        __disable_irq();
-        
-        /* Reset all peripherals */
-        DAL_DeInit();
-        
-        /* Set main stack pointer */
-        __set_MSP(*(__IO uint32_t*)app_addr);
-        
-        /* Jump to application */
-        jump_to_app();
+    RCM->AHB1RST = 0x00000000U;
+    RCM->APB1RST = 0x00000000U;
+    RCM->APB2RST = 0x00000000U;
+    RCM->AHB2RST = 0x00000000U;
+    
+    RCM->AHB1CLKEN = 0x00000000U;
+    RCM->AHB2CLKEN = 0x00000000U;
+    RCM->APB1CLKEN = 0x00000000U;
+    RCM->APB2CLKEN = 0x00000000U;
+    
+    /* Check vector table */
+    if (((*(__IO uint32_t*)APPLICATION_ADDRESS) & 0x2FFE0000 ) == 0x20000000)
+    {
+        /* Jump to user application */
+        JumpAddress = *(__IO uint32_t*) (APPLICATION_ADDRESS + 4);
+        JumpToApplication = (pFunction) JumpAddress;
+
+        /* Initialize user application's Stack Pointer */
+        __set_MSP(*(__IO uint32_t*) APPLICATION_ADDRESS);
+        JumpToApplication();
     }
 }
 
@@ -168,8 +169,6 @@ int main(void)
     /* Device configuration */
     DAL_DeviceConfig();
     DAL_EnableCompensationCell();
-
-    printf("init s\r\n");
     
     GPIO_InitTypeDef  GPIO_InitStruct = {0U};
     /* Configure the LED pin */
@@ -179,14 +178,10 @@ int main(void)
     GPIO_InitStruct.Speed   = GPIO_SPEED_FAST;
 
     DAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-
-    for (int i = 0; i<=10; i++) {
-        printf("pin %d\r\n", DAL_GPIO_ReadPin(GPIOA, GPIO_PIN_10));
-    }
+    DAL_Delay(10);
 
     if(DAL_GPIO_ReadPin(GPIOA, GPIO_PIN_10) == 0)
     {
-        printf("jump \r\n");
         boot_jump_to_app(0x08010000);
     }
 
@@ -197,10 +192,9 @@ int main(void)
         extern bool flash_start;
         extern uint32_t flash_timer;
         if (flash_start) {
-            printf("TIMER %d ms\r\n", DAL_GetTick());
-            printf("flash_timer %d ms\r\n", flash_timer);
-            if (DAL_GetTick() - flash_timer > 3000)
-                NVIC_SystemReset();
+            DAL_Delay(1000);
+            if (DAL_GetTick() - flash_timer > 2000)
+                boot_jump_to_app(0x08010000);
         }
     }
 }

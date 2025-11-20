@@ -79,11 +79,6 @@ __attribute__((weak)) void Set_Clock_Delay(uint32_t clock) {
 
     DAP_Data.clock_delay = delay;
   }
-
-  // printf("MAX clock    %d Hz\r\n", MAX_SWJ_CLOCK(DELAY_FAST_CYCLES));
-  // printf("set clock to %d Hz\r\n", clock); 
-  // printf("is fast_clock %d\r\n", DAP_Data.fast_clock);
-  // printf("clock_delay   %d\r\n", DAP_Data.clock_delay);
 }
 
 
@@ -505,7 +500,6 @@ void cJTAG_tms(uint32_t bits, uint8_t* ucTMS)
 
 void cJtag_active(void)
 {
-    printf("%s\n", __func__);
     JTAG_sequence_escape(10);
     JTAG_sequence_tms(0xFFFF, 24);
     JTAG_sequence_escape(7);

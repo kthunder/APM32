@@ -512,7 +512,6 @@ static inline uint32_t dwc2_get_inep_intstatus(uint8_t busid, uint8_t epnum)
 
 int usb_dc_init(uint8_t busid)
 {
-	printf("####usb_dc_init: busid = %d, ep_num = %d\n", busid, CONFIG_DEV_EP_NUM);
 	int ret;
 	uint8_t fsphy_type;
 	uint8_t hsphy_type;

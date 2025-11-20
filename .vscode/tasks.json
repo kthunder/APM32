@@ -6,7 +6,7 @@
         {
             "type": "shell",
             "label": "Download",
-            "command": "openocd -f interface/cmsis-dap.cfg -f target/geehy/apm32f4x.cfg -c 'cmsis_dap_serial 00000000000000000123456789ABCDEF' -c'program ./build/APM32.elf reset exit' ",
+            "command": "openocd -f interface/cmsis-dap.cfg -f target/geehy/apm32f4x.cfg -c'program ./build/APM32.elf reset exit' ",
             "options": {
                 "cwd": "${workspaceFolder}"
             },
@@ -25,3 +25,4 @@
         }
     ]
 }
+// -c 'cmsis_dap_serial 00000000000000000123456789ABCDEF'
