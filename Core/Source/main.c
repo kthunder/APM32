@@ -172,7 +172,7 @@ int main(void)
     
     GPIO_InitTypeDef  GPIO_InitStruct = {0U};
     /* Configure the LED pin */
-    GPIO_InitStruct.Pin     = GPIO_PIN_10;
+    GPIO_InitStruct.Pin     = GPIO_PIN_9;
     GPIO_InitStruct.Mode    = GPIO_MODE_INPUT;
     GPIO_InitStruct.Pull    = GPIO_PULLDOWN;
     GPIO_InitStruct.Speed   = GPIO_SPEED_FAST;
@@ -180,7 +180,7 @@ int main(void)
     DAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
     DAL_Delay(10);
 
-    if(DAL_GPIO_ReadPin(GPIOA, GPIO_PIN_10) == 0)
+    if(DAL_GPIO_ReadPin(GPIOA, GPIO_PIN_9) == 0)
     {
         boot_jump_to_app(0x08010000);
     }
@@ -198,3 +198,13 @@ int main(void)
         }
     }
 }
+
+/*
+    PA8 : LED
+    PA9 : TX
+    PA10: RX
+    PA13: MCU_SWDIO
+    PA14: MCU_SWCLK
+    PC0 : DAP_SWCLK
+    PC1 : DAP_SWDIO
+*/
