@@ -144,7 +144,7 @@ void boot_jump_to_app(uint32_t app_addr)
     RCM->APB2CLKEN = 0x00000000U;
     
     /* Check vector table */
-    if (((*(__IO uint32_t*)APPLICATION_ADDRESS) & 0x2FFE0000 ) == 0x20000000)
+    if (((*(__IO uint32_t*)APPLICATION_ADDRESS) & 0x20000000 ) == 0x20000000)
     {
         /* Jump to user application */
         JumpAddress = *(__IO uint32_t*) (APPLICATION_ADDRESS + 4);
