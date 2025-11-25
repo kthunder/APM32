@@ -29,7 +29,7 @@ ENTRY(Reset_Handler)
 
 /* Flash Configuration*/
 /* Flash Base Address */
-_rom_base = 0x8000000;
+_rom_base = 0x8010000;
 /*Flash Size (in Bytes) */
 _rom_size = 0x0100000;
 
@@ -122,16 +122,19 @@ SECTIONS
   } >FLASH
 
   _start_address_init_data = LOADADDR(.data);
+  _sidata = LOADADDR(.data);
 
   .data : 
   {
     . = ALIGN(4);
     _start_address_data = .;
+    _sdata = .;
     *(.data)
     *(.data*)
 
     . = ALIGN(4);
     _end_address_data = .;
+    _edata = .;
   } >RAM AT> FLASH
 
   _siccmram = LOADADDR(.ccmram);
@@ -152,6 +155,7 @@ SECTIONS
   {
 
     _start_address_bss = .;
+    _sbss = .;
     __bss_start__ = _start_address_bss;
     *(.bss)
     *(.bss*)
@@ -159,6 +163,7 @@ SECTIONS
 
     . = ALIGN(4);
     _end_address_bss = .;
+    _ebss = .;
     __bss_end__ = _end_address_bss;
   } >RAM
 
