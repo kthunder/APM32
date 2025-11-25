@@ -42,7 +42,7 @@ target_include_directories(app INTERFACE
 file(GLOB_RECURSE SOURCES
     ${CMAKE_SOURCE_DIR}/Libraries/APM32F4xx_DAL_Driver/Source/*.c
     # ${CMAKE_SOURCE_DIR}/Libraries/Device/Geehy/APM32F4xx/*.c
-    ${CMAKE_SOURCE_DIR}/Libraries/Device/Geehy/APM32F4xx/Source/gcc/startup_apm32f407xx.S
+    # ${CMAKE_SOURCE_DIR}/Libraries/Device/Geehy/APM32F4xx/Source/gcc/startup_apm32f407xx.S
     ${CMAKE_SOURCE_DIR}/Core/*.c
     # ${CMAKE_SOURCE_DIR}/Core/DAPHost/*.c
     # ${CMAKE_SOURCE_DIR}/Middlewares/APM32_USB_Library/Device/Class/WINUSB/Src/*.c

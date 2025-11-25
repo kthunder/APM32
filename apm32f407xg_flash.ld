@@ -122,16 +122,19 @@ SECTIONS
   } >FLASH
 
   _start_address_init_data = LOADADDR(.data);
+  _sidata = LOADADDR(.data);
 
   .data : 
   {
     . = ALIGN(4);
     _start_address_data = .;
+    _sdata = .;
     *(.data)
     *(.data*)
 
     . = ALIGN(4);
     _end_address_data = .;
+    _edata = .;
   } >RAM AT> FLASH
 
   _siccmram = LOADADDR(.ccmram);
@@ -152,6 +155,7 @@ SECTIONS
   {
 
     _start_address_bss = .;
+    _sbss = .;
     __bss_start__ = _start_address_bss;
     *(.bss)
     *(.bss*)
@@ -159,6 +163,7 @@ SECTIONS
 
     . = ALIGN(4);
     _end_address_bss = .;
+    _ebss = .;
     __bss_end__ = _end_address_bss;
   } >RAM
 
