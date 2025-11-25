@@ -130,6 +130,7 @@ void Reset_Handler(void)
     __memcpy(_sdata, _sidata, _edata - _sdata);
     SystemInit();
     main();
+    while (1);
 }
 
 SECTION_DATA(".apm32_isr_vector")
