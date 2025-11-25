@@ -132,7 +132,7 @@ void Reset_Handler(void)
     main();
 }
 
-SECTION_DATA(".isr_vector")
+SECTION_DATA(".apm32_isr_vector")
 // typedef void (*IRQ_HandlerType)(void);
 __USED static void (*vector[256])(void) = {
     (void (*)(void))_estack,
