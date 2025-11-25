@@ -29,7 +29,7 @@ ENTRY(Reset_Handler)
 
 /* Flash Configuration*/
 /* Flash Base Address */
-_rom_base = 0x8010000;
+_rom_base = 0x8000000;
 /*Flash Size (in Bytes) */
 _rom_size = 0x0100000;
 
