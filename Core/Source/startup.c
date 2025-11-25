@@ -121,7 +121,7 @@ static void __memcpy(uint8_t *dist, uint8_t *src, uint32_t len)
         *dist++ = *src++;
 }
 
-extern int main();
+extern int main(void);
 
 void Reset_Handler(void)
 {
@@ -130,6 +130,7 @@ void Reset_Handler(void)
     __memcpy(_sdata, _sidata, _edata - _sdata);
     SystemInit();
     main();
+    while (1);
 }
 
 SECTION_DATA(".apm32_isr_vector")
