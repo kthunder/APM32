@@ -3,11 +3,8 @@ extern UART_HandleTypeDef huart1;
 // 添加回调函数指针
 static uint32_t dma_tx_length = 0;
 // DMA发送缓冲区和状态
-static uint8_t uart3_tx_buffer[256];
  volatile uint8_t uart3_dma_tx_busy = 0;
 static uint8_t uart3_rx_buffer[UART_DMA_BUF_LEN];
-static uint8_t uart3_rx_buffer1[UART_DMA_BUF_LEN];
-static volatile uint16_t uart3_rx_write_pos = 0;
 extern chry_ringbuffer_t g_uartrx; // 假设这个环形缓冲区已定义
 
 /* implment by user */
