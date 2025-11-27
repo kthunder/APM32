@@ -31,9 +31,9 @@ void chry_dap_usb2uart_uart_config_callback(struct cdc_line_coding *line_coding)
 {
     huart1.Instance             = USART1;
     huart1.Init.BaudRate        = line_coding->dwDTERate;
-    huart1.Init.WordLength      = UART_WORDLENGTH_8B;
-    huart1.Init.StopBits        = UART_STOPBITS_1;
-    huart1.Init.Parity          = UART_PARITY_NONE;
+    huart1.Init.WordLength      = line_coding->bDataBits;
+    huart1.Init.StopBits        = line_coding->bCharFormat;
+    huart1.Init.Parity          = line_coding->bParityType;
     huart1.Init.Mode            = UART_MODE_TX_RX;
     huart1.Init.HwFlowCtl       = UART_HWCONTROL_NONE;
     huart1.Init.OverSampling    = UART_OVERSAMPLING_16;
@@ -42,11 +42,6 @@ void chry_dap_usb2uart_uart_config_callback(struct cdc_line_coding *line_coding)
     {
         Error_Handler();
     }
-    // 启动接收到空闲
-    DAL_UARTEx_ReceiveToIdle_DMA(&huart1, (uint8_t *)uart3_rx_buffer, sizeof(uart3_rx_buffer));
-}
-void chry_dap_u()
-{
     // 启动接收到空闲
     DAL_UARTEx_ReceiveToIdle_DMA(&huart1, (uint8_t *)uart3_rx_buffer, sizeof(uart3_rx_buffer));
 }
