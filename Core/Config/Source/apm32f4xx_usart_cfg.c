@@ -130,8 +130,8 @@ void DAL_UART_MspInit(UART_HandleTypeDef *huart)
         hdma_usart1Rx.Init.MemInc               = DMA_MINC_ENABLE;
         hdma_usart1Rx.Init.PeriphDataAlignment  = DMA_PDATAALIGN_BYTE;
         hdma_usart1Rx.Init.MemDataAlignment     = DMA_MDATAALIGN_BYTE;
-        hdma_usart1Rx.Init.Mode                 = DMA_NORMAL;
-        hdma_usart1Rx.Init.Priority             = DMA_PRIORITY_LOW;
+        hdma_usart1Rx.Init.Mode                 = DMA_CIRCULAR;
+        hdma_usart1Rx.Init.Priority             = DMA_PRIORITY_HIGH;
         hdma_usart1Rx.Init.FIFOMode             = DMA_FIFOMODE_DISABLE;
         hdma_usart1Rx.Init.FIFOThreshold        = DMA_FIFO_THRESHOLD_FULL;
         hdma_usart1Rx.Init.PeriphBurst          = DMA_PBURST_INC4;

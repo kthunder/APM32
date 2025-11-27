@@ -218,7 +218,7 @@ void DMA2_STR7_IRQHandler(void)
  * @retval    None
  *
  */
-void USART1_IRQHandler(void)
-{
-    DAL_UART_IRQHandler(&huart1);
-}
+// void USART1_IRQHandler(void)
+// {
+//     DAL_UART_IRQHandler(&huart1);
+// }

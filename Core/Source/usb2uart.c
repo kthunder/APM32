@@ -1,28 +1,30 @@
 #include "usb2uart.h"
+
 extern UART_HandleTypeDef huart1;
-// 添加回调函数指针
+
 static uint32_t dma_tx_length = 0;
-// DMA发送缓冲区和状态
- volatile uint8_t uart3_dma_tx_busy = 0;
-static uint8_t uart3_rx_buffer[UART_DMA_BUF_LEN];
-extern chry_ringbuffer_t g_uartrx; // 假设这个环形缓冲区已定义
+volatile uint8_t uart_dma_tx_busy = 0;
+
+static volatile uint16_t last_rx_pos = 0;
+static uint8_t uart_rx_buffer[UART_DMA_BUF_LEN];
+extern chry_ringbuffer_t g_uartrx;
 
 /* implment by user */
 void chry_dap_usb2uart_uart_send_bydma(uint8_t *data, uint16_t len)
 {
-    if (uart3_dma_tx_busy) {
+    if (uart_dma_tx_busy) {
         chry_dap_usb2uart_uart_send_complete(0);
         return;
     }
 
     DAL_UART_Transmit(&huart1, data, len, 1000U);
 
-    uint8_t ret = DAL_UART_Transmit_DMA(&huart1, data, len);
+    DAL_UART_Transmit_DMA(&huart1, data, len);
 
-    // printf("DAL_UART_Transmit_DMA start %d\r\n", ret);
-    uart3_dma_tx_busy = 1;
+    uart_dma_tx_busy = 1;
     dma_tx_length = len;
 }
+
 /* implment by user */
 void chry_dap_usb2uart_uart_config_callback(struct cdc_line_coding *line_coding)
 {
@@ -39,31 +41,69 @@ void chry_dap_usb2uart_uart_config_callback(struct cdc_line_coding *line_coding)
     {
         Error_Handler();
     }
-    // 启动接收到空闲
-    DAL_UARTEx_ReceiveToIdle_DMA(&huart1, (uint8_t *)uart3_rx_buffer, sizeof(uart3_rx_buffer));
+    /* 启动 DMA 接收 */
+    DAL_UART_Receive_DMA(&huart1, uart_rx_buffer, UART_DMA_BUF_LEN);
+    
+    /* 配置 DMA 为循环模式 - APM32 寄存器 */
+    huart1.hdmarx->Instance->SCFG |= DMA_SCFGx_CIRCMEN;
+    
+    /* 启用 IDLE 中断 */
+    __DAL_UART_ENABLE_IT(&huart1, UART_IT_IDLE);
+    last_rx_pos = 0;
 }
 
-/**
- * @brief  Rx Transfer completed callbacks
- *
- * @param  huart  Pointer to a UART_HandleTypeDef structure that contains
- *                the configuration information for the specified UART module
- *
- * @retval None
- */
-void DAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+static inline void uart_rx_copy_data(uint16_t start, uint16_t end)
 {
-    if (huart->Instance == USART1) {
-        chry_ringbuffer_write(&g_uartrx, &uart3_rx_buffer, sizeof(uart3_rx_buffer));
-        DAL_UART_Receive_DMA(&huart1, uart3_rx_buffer, sizeof(uart3_rx_buffer));
+    if (end > start) {
+        chry_ringbuffer_write(&g_uartrx, &uart_rx_buffer[start], end - start);
+    } else if (end < start) {
+        chry_ringbuffer_write(&g_uartrx, &uart_rx_buffer[start], UART_DMA_BUF_LEN - start);
+        if (end > 0) {
+            chry_ringbuffer_write(&g_uartrx, uart_rx_buffer, end);
+        }
     }
 }
 
-void DAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size)
+void USART1_IRQHandler(void)
+{
+    if (__DAL_UART_GET_FLAG(&huart1, UART_FLAG_IDLE)) {
+        __DAL_UART_CLEAR_IDLEFLAG(&huart1);
+        
+        uint16_t current_pos = UART_DMA_BUF_LEN - __DAL_DMA_GET_COUNTER(huart1.hdmarx);
+        uint16_t old_pos = last_rx_pos;
+        
+        if (current_pos != old_pos) {
+            uart_rx_copy_data(old_pos, current_pos);
+            last_rx_pos = current_pos;
+        }
+        return;
+    }
+    
+    DAL_UART_IRQHandler(&huart1);
+}
+
+void DAL_UART_RxHalfCpltCallback(UART_HandleTypeDef *huart)
 {
     if (huart->Instance == USART1) {
-        DAL_UARTEx_ReceiveToIdle_DMA(&huart1, (uint8_t *)uart3_rx_buffer, sizeof(uart3_rx_buffer));
-        chry_ringbuffer_write(&g_uartrx, &uart3_rx_buffer, Size);
+        uint16_t half_pos = UART_DMA_BUF_LEN / 2;
+        uint16_t old_pos = last_rx_pos;
+        
+        if (half_pos != old_pos) {
+            uart_rx_copy_data(old_pos, half_pos);
+            last_rx_pos = half_pos;
+        }
+    }
+}
+
+void DAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+{
+    if (huart->Instance == USART1) {
+        uint16_t old_pos = last_rx_pos;
+        
+        if (UART_DMA_BUF_LEN != old_pos) {
+            uart_rx_copy_data(old_pos, UART_DMA_BUF_LEN);
+            last_rx_pos = 0;
+        }
     }
 }
 
@@ -77,23 +117,8 @@ void DAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size)
  */
 void DAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
 {
-    // 清除忙标志
     if (huart->Instance == USART1) {
-        // printf("%s\n", __func__);
-        uart3_dma_tx_busy = 0;
+        uart_dma_tx_busy = 0;
         chry_dap_usb2uart_uart_send_complete(dma_tx_length);
     }
-    // printf("%s\n", __func__);
-}
-
-/**
- * @brief  UART error callbacks
- *
- * @param  huart  Pointer to a UART_HandleTypeDef structure that contains
- *                the configuration information for the specified UART module
- *
- * @retval None
- */
-void DAL_UART_ErrorCallback(UART_HandleTypeDef *huart)
-{
 }
