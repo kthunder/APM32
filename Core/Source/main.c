@@ -171,16 +171,16 @@ int main(void)
     DAL_EnableCompensationCell();
     
     GPIO_InitTypeDef  GPIO_InitStruct = {0U};
-    /* Configure the LED pin */
-    GPIO_InitStruct.Pin     = GPIO_PIN_9;
+    /* Configure the user KEY pin */
+    GPIO_InitStruct.Pin     = GPIO_PIN_3;
     GPIO_InitStruct.Mode    = GPIO_MODE_INPUT;
-    GPIO_InitStruct.Pull    = GPIO_PULLDOWN;
+    GPIO_InitStruct.Pull    = GPIO_PULLUP;
     GPIO_InitStruct.Speed   = GPIO_SPEED_FAST;
 
     DAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-    DAL_Delay(10);
+    DAL_Delay(5);
 
-    if(DAL_GPIO_ReadPin(GPIOA, GPIO_PIN_9) == 0)
+    if(DAL_GPIO_ReadPin(GPIOA, GPIO_PIN_3) == 1)
     {
         boot_jump_to_app(0x08010000);
     }
