@@ -2436,7 +2436,7 @@ void DAL_UART_IRQHandler(UART_HandleTypeDef *huart)
   uint32_t dmarequest = 0x00U;
 
   /* If no error occurs */
-  errorflags = (isrflags & (uint32_t)(USART_STS_PEFLG | USART_STS_FEFLG | USART_STS_OVREFLG | USART_STS_NEFLG));
+  errorflags = (isrflags & (uint32_t)(USART_STS_PEFLG | USART_STS_NEFLG));
   if (errorflags == RESET)
   {
     /* UART in mode Receiver -------------------------------------------------*/
@@ -2464,17 +2464,17 @@ void DAL_UART_IRQHandler(UART_HandleTypeDef *huart)
     }
 
     /* UART frame error interrupt occurred -----------------------------------*/
-    if (((isrflags & USART_STS_FEFLG) != RESET) && ((cr3its & USART_CTRL3_ERRIEN) != RESET))
-    {
-      huart->ErrorCode |= DAL_UART_ERROR_FE;
-    }
+    // if (((isrflags & USART_STS_FEFLG) != RESET) && ((cr3its & USART_CTRL3_ERRIEN) != RESET))
+    // {
+    //   huart->ErrorCode |= DAL_UART_ERROR_FE;
+    // }
 
     /* UART Over-Run interrupt occurred --------------------------------------*/
-    if (((isrflags & USART_STS_OVREFLG) != RESET) && (((cr1its & USART_CTRL1_RXBNEIEN) != RESET)
-                                                 || ((cr3its & USART_CTRL3_ERRIEN) != RESET)))
-    {
-      huart->ErrorCode |= DAL_UART_ERROR_ORE;
-    }
+    // if (((isrflags & USART_STS_OVREFLG) != RESET) && (((cr1its & USART_CTRL1_RXBNEIEN) != RESET)
+    //                                              || ((cr3its & USART_CTRL3_ERRIEN) != RESET)))
+    // {
+    //   huart->ErrorCode |= DAL_UART_ERROR_ORE;
+    // }
 
     /* Call UART Error Call back function if need be --------------------------*/
     if (huart->ErrorCode != DAL_UART_ERROR_NONE)

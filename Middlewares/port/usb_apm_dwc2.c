@@ -948,9 +948,12 @@ int usbd_ep_start_write(uint8_t busid, const uint8_t ep, const uint8_t* data, ui
 	if (ep_idx && !(USB_OTG_INEP(ep_idx)->DIEPCTL & USB_OTG_DIEPCTL_MPSIZ)) {
 		return -3;
 	}
-	// if ((uint32_t)data & 0x03) {
-	// 	return -4;
-	// }
+
+#ifdef CONFIG_USB_DWC2_DMA_ENABLE
+	if ((uint32_t)data & 0x03) {
+		return -4;
+	}
+#endif
 
 	g_dwc2_udc[busid].in_ep[ep_idx].xfer_buf = (uint8_t*)data;
 	g_dwc2_udc[busid].in_ep[ep_idx].xfer_len = data_len;

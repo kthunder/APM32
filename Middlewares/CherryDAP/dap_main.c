@@ -643,7 +643,7 @@ void chry_dap_usb2uart_handle(uint8_t busid)
         usbtx_idle_flag = 1;
         uarttx_idle_flag = 1;
         config_uart_transfer = 1;
-        //chry_ringbuffer_reset_read(&g_uartrx);
+        chry_ringbuffer_reset_read(&g_uartrx);
         /* enable irq here */
     }
 
