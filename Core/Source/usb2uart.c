@@ -76,6 +76,8 @@ void USART1_IRQHandler(void)
         }
         return;
     }
+
+    __DAL_UART_CLEAR_PEFLAG(&huart1);
     
     DAL_UART_IRQHandler(&huart1);
 }
