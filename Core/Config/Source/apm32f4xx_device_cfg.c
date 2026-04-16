@@ -95,10 +95,10 @@ void DAL_SysClkConfig(void)
     RCM_OscInitStruct.HSEState          = RCM_HSE_ON;
     RCM_OscInitStruct.PLL.PLLState      = RCM_PLL_ON;
     RCM_OscInitStruct.PLL.PLLSource     = RCM_PLLSOURCE_HSE;
-    RCM_OscInitStruct.PLL.PLLB          = 12U;
-    RCM_OscInitStruct.PLL.PLL1A         = 336U;
+    RCM_OscInitStruct.PLL.PLLB          = 6U;
+    RCM_OscInitStruct.PLL.PLL1A         = 288U;
     RCM_OscInitStruct.PLL.PLL1C         = RCM_PLL1C_DIV2;
-    RCM_OscInitStruct.PLL.PLLD          = 7U;
+    RCM_OscInitStruct.PLL.PLLD          = 12U;
     if(DAL_RCM_OscConfig(&RCM_OscInitStruct) != DAL_OK)
     {
         Error_Handler();
@@ -108,8 +108,8 @@ void DAL_SysClkConfig(void)
     RCM_ClkInitStruct.ClockType         = (RCM_CLOCKTYPE_SYSCLK | RCM_CLOCKTYPE_HCLK | RCM_CLOCKTYPE_PCLK1 | RCM_CLOCKTYPE_PCLK2);
     RCM_ClkInitStruct.SYSCLKSource      = RCM_SYSCLKSOURCE_PLLCLK;
     RCM_ClkInitStruct.AHBCLKDivider     = RCM_SYSCLK_DIV1;
-    RCM_ClkInitStruct.APB1CLKDivider    = RCM_HCLK_DIV4;  
-    RCM_ClkInitStruct.APB2CLKDivider    = RCM_HCLK_DIV2;  
+    RCM_ClkInitStruct.APB1CLKDivider    = RCM_HCLK_DIV8;  
+    RCM_ClkInitStruct.APB2CLKDivider    = RCM_HCLK_DIV4;  
     if(DAL_RCM_ClockConfig(&RCM_ClkInitStruct, FLASH_LATENCY_5) != DAL_OK)
     {
         Error_Handler();
