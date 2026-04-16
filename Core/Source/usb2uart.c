@@ -33,7 +33,7 @@ void chry_dap_usb2uart_uart_config_callback(struct cdc_line_coding *line_coding)
     huart1.Init.Parity          = UART_PARITY_NONE;
     huart1.Init.Mode            = UART_MODE_TX_RX;
     huart1.Init.HwFlowCtl       = UART_HWCONTROL_NONE;
-    huart1.Init.OverSampling    = UART_OVERSAMPLING_16;
+    huart1.Init.OverSampling    = UART_OVERSAMPLING_8;
     
     if (DAL_UART_Init(&huart1) != DAL_OK)
     {
