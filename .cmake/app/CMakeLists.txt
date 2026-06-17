@@ -65,6 +65,13 @@ file(GLOB EXLUDE_FILES
 list(REMOVE_ITEM SOURCES 
     ${EXLUDE_FILES}
 )
+
+# Exclude boot_main.c and app_main.c from shared library
+list(REMOVE_ITEM SOURCES 
+    ${CMAKE_SOURCE_DIR}/Core/Source/boot/boot_main.c
+    ${CMAKE_SOURCE_DIR}/Core/Source/app/app_main.c
+    ${CMAKE_SOURCE_DIR}/Core/Source/boot/msc_ram_template.c
+)
 # list(REMOVE_ITEM SOURCES 
 #     ${CMAKE_SOURCE_DIR}/Libraries/APM32F4xx_DAL_Driver/Source/*template.c
 #     # ${CMAKE_SOURCE_DIR}/Cherry/CherryDAP/dap_main.c

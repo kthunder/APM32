@@ -14,7 +14,8 @@
                 "interface/cmsis-dap.cfg",
                 "target/geehy/apm32f4x.cfg",
             ],
-            "svdFile": ".vscode/APM32F40x.svd"
+            "svdFile": ".vscode/APM32F40x.svd",
+            "preLaunchTask": "Build",
         },
         {
             "name": "attach",

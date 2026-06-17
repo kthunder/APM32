@@ -5,23 +5,53 @@
     "tasks": [
         {
             "type": "shell",
-            "label": "Download",
-            "command": "openocd -f interface/cmsis-dap.cfg -f target/geehy/apm32f4x.cfg -c'program ./build/APM32.elf reset exit' ",
-            "options": {
-                "cwd": "${workspaceFolder}"
-            },
-            "problemMatcher": [],
-            "dependsOn":["Build"]
-        },
-        {
-            "type": "shell",
-            "label": "Build",
-            "command": "cmake -S . -B build -G Ninja ; cmake --build build -j12",
+            "label": "Build All",
+            "command": "cmake -S . -B build -G Ninja ; cmake --build build -j12 --target all_firmware",
             "options": {
                 "cwd": "${workspaceFolder}"
             },
             "problemMatcher": [],
             "hide": false
+        },
+        {
+            "type": "shell",
+            "label": "Build Boot",
+            "command": "cmake -S . -B build -G Ninja ; cmake --build build -j12 --target boot",
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [],
+            "hide": false
+        },
+        {
+            "type": "shell",
+            "label": "Build App",
+            "command": "cmake -S . -B build -G Ninja ; cmake --build build -j12 --target app_fw",
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [],
+            "hide": false
+        },
+        {
+            "type": "shell",
+            "label": "Download Boot",
+            "command": "openocd -f interface/cmsis-dap.cfg -f target/geehy/apm32f4x.cfg -c'program ./build/boot.elf reset exit' ",
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [],
+            "dependsOn": ["Build Boot"]
+        },
+        {
+            "type": "shell",
+            "label": "Download App",
+            "command": "openocd -f interface/cmsis-dap.cfg -f target/geehy/apm32f4x.cfg -c'program ./build/app.elf reset exit' ",
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [],
+            "dependsOn": ["Build App"]
         }
     ]
 }

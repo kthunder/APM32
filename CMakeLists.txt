@@ -42,61 +42,82 @@ message("Build type: " ${CMAKE_BUILD_TYPE})
 # Enable CMake support for ASM and C languages
 enable_language(C ASM)
 
-# Create an executable object type
-add_executable(${CMAKE_PROJECT_NAME})
+# Common compile definitions
 add_compile_definitions(APM32F407xx)
 add_compile_definitions(APM32F40X)
 add_compile_definitions(USE_DAL_DRIVER)
 add_compile_definitions(HSE_VALUE=12000000U)
 
-# Add STM32CubeMX generated sources
+# Add shared libraries
 # add_subdirectory(.cmake/stm32cubemx)
 add_subdirectory(.cmake/app)
 add_subdirectory(.cmake/CherryUSB)
 add_subdirectory(.cmake/CherryDAP)
 
-# Link directories setup
-target_link_directories(${CMAKE_PROJECT_NAME} PRIVATE
-    # Add user defined library search paths
+# ==================== Boot Firmware ====================
+add_executable(boot
+    ${CMAKE_SOURCE_DIR}/Core/Source/boot/boot_main.c
+    ${CMAKE_SOURCE_DIR}/Core/Source/boot/msc_ram_template.c
+)
+set_target_properties(boot PROPERTIES SUFFIX ".elf")
+
+target_link_options(boot PRIVATE
+    -T${CMAKE_SOURCE_DIR}/Core/Source/boot/apm32f407xg_flash.ld
 )
 
-# Add sources to executable
-target_sources(${CMAKE_PROJECT_NAME} PRIVATE
-    # Add user sources here
-)
+target_compile_definitions(boot PRIVATE BOOT_FW)
 
-# Add include paths
-target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
-    # Add user defined include paths
-)
-
-# Add project symbols (macros)
-target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE
-    STM32F401xC
-    # Add user defined symbols
-)
-
-# Add linked libraries
-target_link_libraries(${CMAKE_PROJECT_NAME}
-    # stm32cubemx
+target_link_libraries(boot
     app
     CherryUSB
     CherryDAP
-    # Add user defined libraries
 )
 
+set(BOOT_HEX_FILE ${PROJECT_BINARY_DIR}/boot.hex)
+set(BOOT_BIN_FILE ${PROJECT_BINARY_DIR}/boot.bin)
+set(BOOT_DIS_FILE ${PROJECT_BINARY_DIR}/boot.dis)
+set(BOOT_LST_FILE ${PROJECT_BINARY_DIR}/boot.lst)
 
-set(HEX_FILE ${PROJECT_BINARY_DIR}/${CMAKE_PROJECT_NAME}.hex)
-set(BIN_FILE ${PROJECT_BINARY_DIR}/${CMAKE_PROJECT_NAME}.bin)
-set(DIS_FILE ${PROJECT_BINARY_DIR}/${CMAKE_PROJECT_NAME}.dis)
-set(LST_FILE ${PROJECT_BINARY_DIR}/${CMAKE_PROJECT_NAME}.lst)
-
-add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
-        COMMAND ${CMAKE_OBJCOPY} -O ihex $<TARGET_FILE:${CMAKE_PROJECT_NAME}> ${HEX_FILE}
-        COMMAND ${CMAKE_OBJCOPY} -O binary $<TARGET_FILE:${CMAKE_PROJECT_NAME}> ${BIN_FILE}
-        COMMAND ${CMAKE_OBJDUMP} -d $<TARGET_FILE:${CMAKE_PROJECT_NAME}> > ${DIS_FILE}
-        COMMAND ${CMAKE_OBJDUMP} --all-headers --demangle --disassemble $<TARGET_FILE:${PROJECT_NAME}> > ${LST_FILE}
-        # COMMAND ${CMAKE_OBJDUMP} --all-headers --demangle --disassemble $<TARGET_FILE:${CMAKE_PROJECT_NAME}.elf> > ${LST_FILE}
-        COMMAND ${CMAKE_SIZE} --format=berkeley $<TARGET_FILE:${CMAKE_PROJECT_NAME}>
-        COMMENT "Building completed"
+add_custom_command(TARGET boot POST_BUILD
+    COMMAND ${CMAKE_OBJCOPY} -O ihex $<TARGET_FILE:boot> ${BOOT_HEX_FILE}
+    COMMAND ${CMAKE_OBJCOPY} -O binary $<TARGET_FILE:boot> ${BOOT_BIN_FILE}
+    COMMAND ${CMAKE_OBJDUMP} -d $<TARGET_FILE:boot> > ${BOOT_DIS_FILE}
+    COMMAND ${CMAKE_OBJDUMP} --all-headers --demangle --disassemble $<TARGET_FILE:boot> > ${BOOT_LST_FILE}
+    COMMAND ${CMAKE_SIZE} --format=berkeley $<TARGET_FILE:boot>
+    COMMENT "Building boot firmware completed"
 )
+
+# ==================== App Firmware ====================
+add_executable(app_fw
+    ${CMAKE_SOURCE_DIR}/Core/Source/app/app_main.c
+)
+set_target_properties(app_fw PROPERTIES SUFFIX ".elf")
+
+target_link_options(app_fw PRIVATE
+    -T${CMAKE_SOURCE_DIR}/Core/Source/app/apm32f407xg_flash.ld
+)
+
+target_compile_definitions(app_fw PRIVATE APP_FW)
+
+target_link_libraries(app_fw
+    app
+    CherryUSB
+    CherryDAP
+)
+
+set(APP_HEX_FILE ${PROJECT_BINARY_DIR}/app.hex)
+set(APP_BIN_FILE ${PROJECT_BINARY_DIR}/app.bin)
+set(APP_DIS_FILE ${PROJECT_BINARY_DIR}/app.dis)
+set(APP_LST_FILE ${PROJECT_BINARY_DIR}/app.lst)
+
+add_custom_command(TARGET app_fw POST_BUILD
+    COMMAND ${CMAKE_OBJCOPY} -O ihex $<TARGET_FILE:app_fw> ${APP_HEX_FILE}
+    COMMAND ${CMAKE_OBJCOPY} -O binary $<TARGET_FILE:app_fw> ${APP_BIN_FILE}
+    COMMAND ${CMAKE_OBJDUMP} -d $<TARGET_FILE:app_fw> > ${APP_DIS_FILE}
+    COMMAND ${CMAKE_OBJDUMP} --all-headers --demangle --disassemble $<TARGET_FILE:app_fw> > ${APP_LST_FILE}
+    COMMAND ${CMAKE_SIZE} --format=berkeley $<TARGET_FILE:app_fw>
+    COMMENT "Building app firmware completed"
+)
+
+# Combined target to build both
+add_custom_target(all_firmware DEPENDS boot app_fw)
