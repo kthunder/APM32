@@ -58,14 +58,14 @@ int main(void)
     DAL_EnableCompensationCell();
 
     /* Infinite loop */
-    chry_dap_init(1,USB_OTG_HS_PERIPH_BASE);
+    chry_dap_init(0,USB_OTG_HS_PERIPH_BASE);
 
-    while (!usb_device_is_configured(1)) {
+    while (!usb_device_is_configured(0)) {
     }
 
     while (1) {
-        chry_dap_handle(1);
-        chry_dap_usb2uart_handle(1);
+        chry_dap_handle();
+        chry_dap_usb2uart_handle();
     }
 }
 
