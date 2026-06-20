@@ -2,7 +2,7 @@ import usb.core
 import usb.util
 import time
 
-dev = usb.core.find(idVendor=0x0D28, idProduct=0x0204, serial_number="10000000000000000123456789ABCDEF")
+dev: usb.core.Device = usb.core.find(idVendor=0x0D28, idProduct=0x0204, serial_number="10000000000000000123456789ABCDEF")  # type: ignore[assignment]
 if dev is None:
     raise ValueError("设备未找到")
 
@@ -10,12 +10,13 @@ dev.set_configuration()
 cfg = dev.get_active_configuration()
 
 # 查找第一个有端点的0xFF接口
-intf = None
+intf: usb.core.Interface | None = None
 for i in cfg:
     if i.bInterfaceClass == 0xFF and i.bNumEndpoints > 0:
         intf = i
         break
 
+assert intf is not None, "未找到合适的USB接口"
 usb.util.claim_interface(dev, intf.bInterfaceNumber)
 
 ep_out = usb.util.find_descriptor(
