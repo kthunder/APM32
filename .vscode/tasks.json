@@ -21,7 +21,7 @@
                 "cwd": "${workspaceFolder}"
             },
             "problemMatcher": [],
-            "hide": false
+            "hide": true
         },
         {
             "type": "shell",
@@ -31,7 +31,7 @@
                 "cwd": "${workspaceFolder}"
             },
             "problemMatcher": [],
-            "hide": false
+            "hide": true
         },
         {
             "type": "shell",

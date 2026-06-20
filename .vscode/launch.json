@@ -16,12 +16,14 @@
             ],
             "svdFile": ".vscode/APM32F40x.svd",
             "preLaunchTask": "Build All",
+            "symbolFiles": [
+                "./build/app_fw.elf"
+            ]
         },
         {
             "name": "attach",
             "cwd": "${workspaceFolder}",
-            // "executable": "./build/app_fw.elf",
-            "executable": "./build/boot.elf",
+            "executable": "./build/app_fw.elf",
             "request": "attach",
             "type": "cortex-debug",
             "runToEntryPoint": "main",
@@ -33,7 +35,7 @@
             ],
             "svdFile": ".vscode/APM32F40x.svd",
             "symbolFiles": [
-                "./build/app_fw.elf"
+                "./build/boot.elf"
             ]
         },
     ]
