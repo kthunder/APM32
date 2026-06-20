@@ -52,4 +52,6 @@ void DAL_RCM_PeripheralClkConfig(void)
     /* Enable the LED Clock */
     __DAL_RCM_GPIOA_CLK_ENABLE();
     __DAL_RCM_GPIOC_CLK_ENABLE();
+
+    __DAL_RCM_RTC_ENABLE();
 }

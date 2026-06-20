@@ -4,7 +4,7 @@
         {
             "name": "launch",
             "cwd": "${workspaceFolder}",
-            "executable": "./build/${workspaceFolderBasename}.elf",
+            "executable": "./build/app_fw.elf",
             "request": "launch",
             "type": "cortex-debug",
             "runToEntryPoint": "main",
@@ -15,12 +15,13 @@
                 "target/geehy/apm32f4x.cfg",
             ],
             "svdFile": ".vscode/APM32F40x.svd",
-            "preLaunchTask": "Build",
+            "preLaunchTask": "Build All",
         },
         {
             "name": "attach",
             "cwd": "${workspaceFolder}",
-            "executable": "./build/${workspaceFolderBasename}.elf",
+            // "executable": "./build/app_fw.elf",
+            "executable": "./build/boot.elf",
             "request": "attach",
             "type": "cortex-debug",
             "runToEntryPoint": "main",
@@ -30,7 +31,10 @@
                 "interface/cmsis-dap.cfg",
                 "target/geehy/apm32f4x.cfg",
             ],
-            "svdFile": ".vscode/APM32F40x.svd"
+            "svdFile": ".vscode/APM32F40x.svd",
+            "symbolFiles": [
+                "./build/app_fw.elf"
+            ]
         },
     ]
 }

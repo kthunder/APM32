@@ -17,6 +17,7 @@ target_include_directories(CherryUSB INTERFACE
     ${CMAKE_SOURCE_DIR}/Middlewares/CherryUSB/class/cdc
     ${CMAKE_SOURCE_DIR}/Middlewares/CherryUSB/class/msc
     ${CMAKE_SOURCE_DIR}/Middlewares/CherryUSB/class/hid
+    ${CMAKE_SOURCE_DIR}/Middlewares/CherryUSB/class/dfu
     ${CMAKE_SOURCE_DIR}/Middlewares/CherryUSB/demo
     ${CMAKE_SOURCE_DIR}/Middlewares/CherryUSB/port/dwc2
 
@@ -27,6 +28,7 @@ target_sources(CherryUSB INTERFACE
     ${CMAKE_SOURCE_DIR}/Middlewares/CherryUSB/core/usbd_core.c
     ${CMAKE_SOURCE_DIR}/Middlewares/CherryUSB/class/msc/usbd_msc.c
     ${CMAKE_SOURCE_DIR}/Middlewares/CherryUSB/class/cdc/usbd_cdc_acm.c
+    ${CMAKE_SOURCE_DIR}/Middlewares/CherryUSB/class/dfu/usbd_dfu.c
     # ${CMAKE_SOURCE_DIR}/Middlewares/CherryUSB/demo/cdc_acm_template.c
     # ${CMAKE_SOURCE_DIR}/Middlewares/CherryUSB/demo/winusb2.0_cdc_template.c
 

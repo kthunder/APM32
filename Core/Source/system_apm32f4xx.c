@@ -68,7 +68,13 @@
 /* #define VECT_TAB_SRAM */
 
 /* Vector table base offset field. This value must be a multiple of 0x200 */
-#define VECT_TAB_OFFSET  0x00
+#if defined(BOOT_FW)
+#define VECT_TAB_OFFSET  0x00000U   /* Boot @ 0x08000000 */
+#elif defined(APP_FW)
+#define VECT_TAB_OFFSET  0x10000U   /* App  @ 0x08010000 */
+#else
+#define VECT_TAB_OFFSET  0x00000U
+#endif
 
 /**
   * @}

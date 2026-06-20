@@ -35,11 +35,12 @@
 /* Private typedef ********************************************************/
 
 /* Private variables ******************************************************/
-
+#define mv_to_value(v) (4095*(v)/3300)
+__IO uint16_t dacValue = mv_to_value(3300);
 /* Private function prototypes ********************************************/
 
 /* External variables *****************************************************/
-
+extern DAC_HandleTypeDef hdac;
 /* External functions *****************************************************/
 
 extern UART_HandleTypeDef huart1;
@@ -52,15 +53,24 @@ extern UART_HandleTypeDef huart1;
  */
 int main(void)
 {
-    SCB->VTOR = 0x08010000;
     /* Device configuration */
     DAL_DeviceConfig();
     DAL_EnableCompensationCell();
 
-    /* Infinite loop */
-    chry_dap_init(0,USB_OTG_HS_PERIPH_BASE);
+    // DAL_Delay(3000);
+    // RTC->BAKP19 = 0x5afe;
+    // NVIC_SystemReset();
 
-    while (!usb_device_is_configured(0)) {
+    /* Start DAC channel 1 output */
+    DAL_DAC_Start(&hdac, DAC_CHANNEL_1);
+
+    /* Generate analog signal */
+    DAL_DAC_SetValue(&hdac, DAC_CHANNEL_1, DAC_ALIGN_12B_R, dacValue);
+
+    /* Infinite loop */
+    chry_dap_init(1,USB_OTG_HS_PERIPH_BASE);
+
+    while (!usb_device_is_configured(1)) {
     }
 
     while (1) {

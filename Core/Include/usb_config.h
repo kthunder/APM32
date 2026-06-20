@@ -201,6 +201,7 @@
 #define CONFIG_USBHOST_BLUETOOTH_RX_SIZE 2048
 #endif
 
+#define USBD_DFU_XFER_SIZE   512
 /* ================ USB Device Port Configuration ================*/
 
 #ifndef CONFIG_USBDEV_MAX_BUS

@@ -124,34 +124,19 @@ typedef void (*pFunction)(void);
  */
 void boot_jump_to_app(uint32_t app_addr)
 {
-    #define APPLICATION_ADDRESS 0x08010000
     pFunction JumpToApplication;
     uint32_t JumpAddress;
-
-    RCM->AHB1RST = 0xFFFFFFFFU;
-    RCM->APB1RST = 0xFFFFFFFFU;
-    RCM->APB2RST = 0xFFFFFFFFU;
-    RCM->AHB2RST = 0xFFFFFFFFU;
-    
-    RCM->AHB1RST = 0x00000000U;
-    RCM->APB1RST = 0x00000000U;
-    RCM->APB2RST = 0x00000000U;
-    RCM->AHB2RST = 0x00000000U;
-    
-    RCM->AHB1CLKEN = 0x00000000U;
-    RCM->AHB2CLKEN = 0x00000000U;
-    RCM->APB1CLKEN = 0x00000000U;
-    RCM->APB2CLKEN = 0x00000000U;
     
     /* Check vector table */
-    if (((*(__IO uint32_t*)APPLICATION_ADDRESS) & 0x20000000 ) == 0x20000000)
+    if (((*(__IO uint32_t*)app_addr) & 0x20000000 ) == 0x20000000)
     {
         /* Jump to user application */
-        JumpAddress = *(__IO uint32_t*) (APPLICATION_ADDRESS + 4);
+        JumpAddress = *(__IO uint32_t*) (app_addr + 4);
         JumpToApplication = (pFunction) JumpAddress;
 
         /* Initialize user application's Stack Pointer */
-        __set_MSP(*(__IO uint32_t*) APPLICATION_ADDRESS);
+        __set_MSP(*(__IO uint32_t*) app_addr);
+        SCB->VTOR = app_addr;
         JumpToApplication();
     }
 }
@@ -165,38 +150,101 @@ void boot_jump_to_app(uint32_t app_addr)
  */
 int main(void)
 {
-    
     /* Device configuration */
     DAL_DeviceConfig();
     DAL_EnableCompensationCell();
     
-    GPIO_InitTypeDef  GPIO_InitStruct = {0U};
-    /* Configure the user KEY pin */
-    GPIO_InitStruct.Pin     = GPIO_PIN_3;
-    GPIO_InitStruct.Mode    = GPIO_MODE_INPUT;
-    GPIO_InitStruct.Pull    = GPIO_PULLUP;
-    GPIO_InitStruct.Speed   = GPIO_SPEED_FAST;
-
-    DAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-    DAL_Delay(5);
-
-    if(DAL_GPIO_ReadPin(GPIOA, GPIO_PIN_3) == 1)
+    if (RTC->BAKP19 != 0x5AFE)
     {
         boot_jump_to_app(0x08010000);
     }
+    RTC->BAKP19 = 0x0;
 
-    /* Infinite loop */
-    extern void msc_ram_init(uint8_t busid, uintptr_t reg_base);
-    msc_ram_init(1, USB_OTG_HS_PERIPH_BASE);
+    __enable_irq();  /* SystemInit() disables all interrupts, re-enable before USB */
+void dfu_flash_init(uint8_t busid, uintptr_t reg_base);
+    dfu_flash_init(1, USB_OTG_HS_PERIPH_BASE);
     while (1) {
-        extern bool flash_start;
-        extern uint32_t flash_timer;
-        if (flash_start) {
-            DAL_Delay(1000);
-            if (DAL_GetTick() - flash_timer > 2000)
-                boot_jump_to_app(0x08010000);
-        }
+        
     }
+    // GPIO_InitTypeDef  GPIO_InitStruct = {0U};
+    // /* Configure the user KEY pin */
+    // GPIO_InitStruct.Pin     = GPIO_PIN_3;
+    // GPIO_InitStruct.Mode    = GPIO_MODE_INPUT;
+    // GPIO_InitStruct.Pull    = GPIO_PULLUP;
+    // GPIO_InitStruct.Speed   = GPIO_SPEED_FAST;
+
+    // DAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+    // DAL_Delay(5);
+
+    // if(DAL_GPIO_ReadPin(GPIOA, GPIO_PIN_3) == 1)
+    // {
+    //     boot_jump_to_app(0x08010000);
+    // }
+
+    // /* Infinite loop */
+    // extern void msc_ram_init(uint8_t busid, uintptr_t reg_base);
+    // msc_ram_init(1, USB_OTG_HS_PERIPH_BASE);
+    // while (1) {
+    //     extern bool flash_start;
+    //     extern uint32_t flash_timer;
+    //     if (flash_start) {
+    //         DAL_Delay(1000);
+    //         if (DAL_GetTick() - flash_timer > 2000)
+    //             boot_jump_to_app(0x08010000);
+    //     }
+    // }
+}
+
+uint8_t *dfu_read_flash(uint8_t *src, uint8_t *dest, uint32_t len)
+{
+  uint32_t i = 0;
+  uint8_t *psrc = src;
+
+  for (i = 0; i < len; i++)
+  {
+    dest[i] = *psrc++;
+  }
+  /* Return a valid address to avoid HardFault */
+  return (uint8_t *)(dest);
+}
+
+uint16_t dfu_write_flash(uint8_t *src, uint8_t *dest, uint32_t len)
+{
+  DAL_FLASH_Unlock();
+  uint32_t i = 0;
+
+  for (i = 0; i < len; i += 4)
+  {
+    /* Device voltage range supposed to be [2.7V to 3.6V], the operation will
+     * be done by byte */
+    if (DAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, (uint32_t)(dest + i),
+                          *(uint32_t *)(src + i)) == DAL_OK)
+    {
+      /* Check the written value */
+      if (*(uint32_t *)(src + i) != *(uint32_t *)(dest + i))
+      {
+        /* Flash content doesn't match SRAM content */
+        return (1);
+      }
+    }
+    else
+    {
+      /* Error occurred while writing data in Flash memory */
+      return (2);
+    }
+  }
+  return 0;
+}
+
+uint16_t dfu_erase_flash(uint32_t add)
+{
+  flash_erase(add);
+  return 0;
+}
+
+void dfu_leave(void)
+{
+    NVIC_SystemReset();
 }
 
 /*

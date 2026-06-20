@@ -313,13 +313,15 @@ of the same I/O port. The following SWDIO I/O Pin functions are provided:
 // GPIOC
 #define PORT_CLK    GPIOC
 #define PORT_DIO    GPIOC
-#define PORT_TDI    GPIOC
-#define PORT_TDO    GPIOC
+#define PORT_TDI    PORT_DIO
+#define PORT_TDO    PORT_DIO
+#define PORT_DIR    GPIOC
 #define PORT_nRESET GPIOC
 #define PIN_CLK     GPIO_PIN_0
 #define PIN_DIO     GPIO_PIN_1
-#define PIN_TDI     GPIO_PIN_2
-#define PIN_TDO     GPIO_PIN_3
+#define PIN_TDI     PIN_DIO
+#define PIN_TDO     PIN_DIO
+#define PIN_DIR     GPIO_PIN_2
 #define PIN_nRESET  GPIO_PIN_11
 // 0b1000上下拉输入
 // 0b0011推挽输出
@@ -337,8 +339,8 @@ extern uint32_t * delay_cjtag;
 
 #define cJTAG_DELAY() PIN_DELAY_SLOWX(*delay_cjtag);
 
-#define iPIN_TMS_INPUT_ENABLE()      *BITBAND_PERI(&PORT_DIO->MODE, __builtin_ctz(PIN_DIO)*2) = 0;cJTAG_DELAY();
-#define iPIN_TMS_INPUT_DISABLE()     *BITBAND_PERI(&PORT_DIO->MODE, __builtin_ctz(PIN_DIO)*2) = 1;cJTAG_DELAY();
+#define iPIN_TMS_INPUT_ENABLE()      *BITBAND_PERI(&PORT_DIO->MODE, __builtin_ctz(PIN_DIO)*2) = 0;iGPIO_CLR(PORT_DIR, PIN_DIR);cJTAG_DELAY();
+#define iPIN_TMS_INPUT_DISABLE()     iGPIO_SET(PORT_DIR, PIN_DIR);*BITBAND_PERI(&PORT_DIO->MODE, __builtin_ctz(PIN_DIO)*2) = 1;cJTAG_DELAY();
 
 #define BITBAND_PERI(ref, bit) ((volatile uint32_t *)(PERIPH_BB_BASE + (((uint32_t)(ref) - 0x40000000) * 32) + ((bit) * 4)))
 
@@ -396,23 +398,16 @@ __STATIC_INLINE void PORT_JTAG_SETUP (void) {
     DAL_GPIO_WritePin(GPIOA, GPIO_PIN_8, GPIO_PIN_RESET);
 
 
-    // TCK TMS TDI PIN_nRESET
-    GPIO_InitStruct.Pin     = PIN_CLK | PIN_DIO | PIN_TDI | PIN_nRESET;
+    // TCK DIO DIR
+    GPIO_InitStruct.Pin     = PIN_CLK | PIN_DIO | PIN_DIR;
     GPIO_InitStruct.Mode    = GPIO_MODE_OUTPUT_PP;
     GPIO_InitStruct.Pull    = GPIO_PULLUP;
     GPIO_InitStruct.Speed   = GPIO_SPEED_HIGH;
 
     DAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
-    DAL_GPIO_WritePin(GPIOC, PIN_CLK | PIN_DIO | PIN_TDI | PIN_nRESET, GPIO_PIN_RESET);
-
-    // TDO
-    GPIO_InitStruct.Pin     = PIN_TDO;
-    GPIO_InitStruct.Mode    = GPIO_MODE_INPUT;
-    GPIO_InitStruct.Pull    = GPIO_PULLUP;
-    GPIO_InitStruct.Speed   = GPIO_SPEED_HIGH;
-
-    DAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+    // DAL_GPIO_WritePin(GPIOC, PIN_CLK | PIN_DIO | PIN_nRESET, GPIO_PIN_RESET);
+    DAL_GPIO_WritePin(GPIOC, PIN_CLK | PIN_DIO | PIN_DIR, GPIO_PIN_RESET);
 }
 
 /** Setup SWD I/O pins: SWCLK, SWDIO, and nRESET.
@@ -437,15 +432,16 @@ __STATIC_INLINE void PORT_SWD_SETUP (void) {
     DAL_GPIO_WritePin(GPIOA, GPIO_PIN_8, GPIO_PIN_RESET);
 
 
-    // TCK TMS TDI PIN_nRESET
-    GPIO_InitStruct.Pin     = PIN_CLK | PIN_DIO | PIN_nRESET;
+    // TCK DIO DIR
+    GPIO_InitStruct.Pin     = PIN_CLK | PIN_DIO | PIN_DIR;
     GPIO_InitStruct.Mode    = GPIO_MODE_OUTPUT_PP;
     GPIO_InitStruct.Pull    = GPIO_PULLUP;
     GPIO_InitStruct.Speed   = GPIO_SPEED_HIGH;
 
     DAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
-    DAL_GPIO_WritePin(GPIOC, PIN_CLK | PIN_DIO | PIN_nRESET, GPIO_PIN_RESET);
+    // DAL_GPIO_WritePin(GPIOC, PIN_CLK | PIN_DIO | PIN_nRESET, GPIO_PIN_RESET);
+    DAL_GPIO_WritePin(GPIOC, PIN_CLK | PIN_DIO | PIN_DIR, GPIO_PIN_RESET);
 }
 
 /** Disable JTAG/SWD I/O Pins.
@@ -455,7 +451,7 @@ Disables the DAP Hardware I/O pins which configures:
 __STATIC_INLINE void PORT_OFF (void) {
     GPIO_InitTypeDef  GPIO_InitStruct = {0U};
     // TDO
-    GPIO_InitStruct.Pin     = PIN_CLK | PIN_DIO | PIN_TDO | PIN_nRESET;
+    GPIO_InitStruct.Pin     = PIN_CLK | PIN_DIO | PIN_TDO | PIN_DIR | PIN_nRESET;
     GPIO_InitStruct.Mode    = GPIO_MODE_INPUT;
     GPIO_InitStruct.Pull    = GPIO_PULLUP;
     GPIO_InitStruct.Speed   = GPIO_SPEED_HIGH;

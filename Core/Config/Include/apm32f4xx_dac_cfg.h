@@ -1,7 +1,7 @@
 /**
- * @file        apm32f4xx_device_cfg.h
+ * @file        apm32f4xx_dac_cfg.h
  *
- * @brief       This file provides all configuration support for device
+ * @brief       This file provides configuration support for DAC
  *
  * @version     V1.0.0
  *
@@ -24,8 +24,8 @@
  */
 
 /* Define to prevent recursive inclusion */
-#ifndef APM32F4XX_DEVICE_CFG_H
-#define APM32F4XX_DEVICE_CFG_H
+#ifndef APM32F4XX_DAC_CFG_H
+#define APM32F4XX_DAC_CFG_H
 
 #ifdef __cplusplus
   extern "C" {
@@ -33,23 +33,16 @@
 
 /* Includes ***************************************************************/
 #include "apm32f4xx_dal.h"
-#include "apm32f4xx_rcm_cfg.h"
-#include "apm32f4xx_gpio_cfg.h"
-#include "apm32f4xx_usart_cfg.h"
-#include "apm32f4xx_nvic_cfg.h"
-#include "apm32f4xx_dac_cfg.h"
-#include "apm32f4xx_rtc_cfg.h"
 
 /* Exported macro *********************************************************/
 
 /* Exported typedef *******************************************************/
 
 /* Exported function prototypes *******************************************/
-void DAL_DeviceConfig(void);
-void DAL_SysClkConfig(void);
+void DAL_DAC_Config(void);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* APM32F4XX_DEVICE_CFG_H */
+#endif /* APM32F4XX_DAC_CFG_H */

@@ -62,7 +62,9 @@ void DAL_DeviceConfig(void)
     DAL_GPIO_Config();
     
     /* Configure peripheral */
+    DAL_DAC_Config();
     DAL_USART1_Config();
+    DAL_RTC_Config();
 
     /* Configure NVIC */
     DAL_NVIC_Config();

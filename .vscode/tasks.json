@@ -46,7 +46,7 @@
         {
             "type": "shell",
             "label": "Download App",
-            "command": "openocd -f interface/cmsis-dap.cfg -f target/geehy/apm32f4x.cfg -c'program ./build/app.elf reset exit' ",
+            "command": "openocd -f interface/cmsis-dap.cfg -f target/geehy/apm32f4x.cfg -c'program ./build/app_fw.elf reset exit' ",
             "options": {
                 "cwd": "${workspaceFolder}"
             },
