@@ -35,15 +35,22 @@
 /* Private typedef ********************************************************/
 
 /* Private variables ******************************************************/
-#define mv_to_value(v) (4095*(v)/3300)
-__IO uint16_t dacValue = mv_to_value(3300);
+
 /* Private function prototypes ********************************************/
 
 /* External variables *****************************************************/
 extern DAC_HandleTypeDef hdac;
+extern UART_HandleTypeDef huart1;
 /* External functions *****************************************************/
 
-extern UART_HandleTypeDef huart1;
+void set_vref(uint32_t mv)
+{
+#define mv_to_value(v) (4095*(v)/3300)
+    /* Start DAC channel 1 output */
+    DAL_DAC_Start(&hdac, DAC_CHANNEL_1);
+    /* Generate analog signal */
+    DAL_DAC_SetValue(&hdac, DAC_CHANNEL_1, DAC_ALIGN_12B_R, mv_to_value(mv));
+}
 /**
  * @brief   Main program
  *
@@ -60,12 +67,7 @@ int main(void)
     // DAL_Delay(3000);
     // RTC->BAKP19 = 0x5afe;
     // NVIC_SystemReset();
-
-    /* Start DAC channel 1 output */
-    DAL_DAC_Start(&hdac, DAC_CHANNEL_1);
-
-    /* Generate analog signal */
-    DAL_DAC_SetValue(&hdac, DAC_CHANNEL_1, DAC_ALIGN_12B_R, dacValue);
+    set_vref(3300);
 
     /* Infinite loop */
     chry_dap_init(1,USB_OTG_HS_PERIPH_BASE);
