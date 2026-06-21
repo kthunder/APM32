@@ -57,6 +57,7 @@ uint32_t * delay_cjtag = &DAP_Data.clock_delay;
 static const char DAP_FW_Ver [] = DAP_FW_VER;
 
 uint8_t cJtag_enabled = 0; // JTAG enabled flag 
+uint32_t cJtag_vref = 0; // JTAG Vref mv
 
 // Common clock delay calculation routine
 //   clock:    requested SWJ frequency in Hertz

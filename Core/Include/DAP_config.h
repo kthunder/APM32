@@ -408,6 +408,10 @@ __STATIC_INLINE void PORT_JTAG_SETUP (void) {
 
     DAL_GPIO_WritePin(GPIOC, PIN_CLK | PIN_DIO | PIN_nRESET, GPIO_PIN_RESET);
     DAL_GPIO_WritePin(GPIOC, PIN_DIR, GPIO_PIN_SET);
+    extern void set_vref(uint32_t mv);
+    extern uint32_t cJtag_vref;
+    set_vref(cJtag_vref?cJtag_vref:3300);
+    cJtag_vref = 0;
 }
 
 /** Setup SWD I/O pins: SWCLK, SWDIO, and nRESET.
@@ -441,7 +445,12 @@ __STATIC_INLINE void PORT_SWD_SETUP (void) {
     DAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
     // DAL_GPIO_WritePin(GPIOC, PIN_CLK | PIN_DIO | PIN_nRESET, GPIO_PIN_RESET);
-    DAL_GPIO_WritePin(GPIOC, PIN_CLK | PIN_DIO | PIN_DIR, GPIO_PIN_RESET);
+    DAL_GPIO_WritePin(GPIOC, PIN_CLK | PIN_DIO, GPIO_PIN_RESET);
+    DAL_GPIO_WritePin(GPIOC, PIN_DIR, GPIO_PIN_SET);
+    extern void set_vref(uint32_t mv);
+    set_vref(3300);
+    extern uint8_t cJtag_enabled;
+    cJtag_enabled = 0;
 }
 
 /** Disable JTAG/SWD I/O Pins.
@@ -457,7 +466,7 @@ __STATIC_INLINE void PORT_OFF (void) {
     GPIO_InitStruct.Speed   = GPIO_SPEED_HIGH;
 
     DAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
-    DAL_GPIO_DeInit(GPIOC, PIN_CLK | PIN_DIO | PIN_TDO | PIN_nRESET);
+    DAL_GPIO_DeInit(GPIOC, PIN_CLK | PIN_DIO | PIN_TDO | PIN_DIR | PIN_nRESET);
 }
 
 

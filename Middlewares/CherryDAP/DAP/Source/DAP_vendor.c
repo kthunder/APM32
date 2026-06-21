@@ -91,10 +91,10 @@ uint32_t DAP_ProcessVendorCommand(const uint8_t *request, uint8_t *response) {
     case ID_DAP_Vendor28: break;
     case ID_DAP_Vendor29: {
       num += 1U << 16;           // increment request count
-      extern void set_vref(uint32_t mv);
+      extern uint32_t cJtag_vref;
       if (((*request) >= 15)|| ((*request) <= 33))
       {
-        set_vref((*request)*100);
+        cJtag_vref = (*request)*100;
       }
       *response++ = DAP_OK;
       num++;
