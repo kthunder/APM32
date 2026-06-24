@@ -56,7 +56,7 @@
         {
             "type": "shell",
             "label": "dfu update App",
-            "command": "python ./usb_manager.py ; Start-Sleep -Seconds 1 ; dfu-util -a 0 -s 0x08010000:leave -D ./build/app.bin",
+            "command": "python ./usb_manager.py ; Start-Sleep -Seconds 1 ; dfu-util -S '2022123456' -a 0 -s 0x08010000:leave -D ./build/app.bin",
             "options": {
                 "cwd": "${workspaceFolder}"
             },
